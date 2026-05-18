@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AURA - My Playlist</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+    <!-- Animate CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+
+        body{
+
+            background:
+                    linear-gradient(rgba(0,0,0,0.88),
+                    rgba(0,0,0,0.96)),
+                    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1470&auto=format&fit=crop');
+
+            background-size:cover;
+            background-attachment:fixed;
+
+            color:white;
+
+            font-family:'Segoe UI',sans-serif;
+
+            min-height:100vh;
+
+            padding-bottom:120px;
+        }
+
+        /* NAVBAR */
+
+        .navbar{
+
+            background:rgba(0,0,0,0.75);
+
+            backdrop-filter:blur(10px);
+
+            box-shadow:0 3px 12px rgba(0,0,0,0.4);
+        }
+
+        .navbar-brand{
+
+            color:#9d6bff !important;
+
+            font-size:32px;
+
+            font-weight:800;
+
+            letter-spacing:2px;
+        }
+
+        /* PLAYLIST HEADER */
+
+        .playlist-header{
+
+            background:
+                    linear-gradient(to right,
+                    rgba(157,107,255,0.25),
+                    rgba(124,58,237,0.15));
+
+            border-radius:30px;
+
+            padding:35px;
+
+            margin-top:40px;
+
+            margin-bottom:35px;
+
+            box-shadow:0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .playlist-name{
+
+            font-size:42px;
+
+            font-weight:800;
+
+            color:#ffffff;
+        }
+
+        .playlist-info{
+
+            color:#cfcfcf;
+
+            margin-top:10px;
+        }
+
+        /* SONG LIST */
+
+        .song-card{
+
+            background:rgba(24,24,24,0.95);
+
+            border-radius:22px;
+
+            padding:18px;
+
+            margin-bottom:18px;
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            transition:0.3s;
+
+            border:1px solid transparent;
+        }
+
+        .song-card:hover{
+
+            transform:translateY(-4px);
+
+            background:#232323;
+
+            border:1px solid rgba(157,107,255,0.3);
+        }
+
+        /* CURRENTLY PLAYING */
+
+        .playing{
+
+            background:
+                    linear-gradient(to right,
+                    rgba(157,107,255,0.22),
+                    rgba(124,58,237,0.18));
+
+            border:1px solid #9d6bff;
+
+            box-shadow:0 0 18px rgba(157,107,255,0.4);
+        }
+
+        .playing .song-title{
+
+            color:#b48cff;
+        }
+
+        .playing-animation{
+
+            color:#9d6bff;
+
+            margin-left:10px;
+
+            animation:pulse 1s infinite;
+        }
+
+        @keyframes pulse{
+
+            0%{
+                opacity:0.4;
+            }
+
+            50%{
+                opacity:1;
+            }
+
+            100%{
+                opacity:0.4;
+            }
+        }
+
+        /* SONG INFO */
+
+        .song-info{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:18px;
+        }
+
+        .song-info img{
+
+            width:75px;
+
+            height:75px;
+
+            border-radius:18px;
+
+            object-fit:cover;
+        }
+
+        .song-title{
+
+            font-size:20px;
+
+            font-weight:bold;
+        }
+
+        .artist{
+
+            color:#b3b3b3;
+
+            margin-top:4px;
+        }
+
+        /* SONG ACTIONS */
+
+        .song-actions i{
+
+            font-size:20px;
+
+            margin-left:22px;
+
+            cursor:pointer;
+
+            transition:0.3s;
+        }
+
+        .song-actions i:hover{
+
+            color:#9d6bff;
+
+            transform:scale(1.2);
+        }
+
+        .play-btn{
+
+            color:#9d6bff;
+        }
+
+        .delete-btn{
+
+            color:#ff4d4d;
+        }
+
+        /* PLAYER BAR */
+
+        .player-bar{
+
+            position:fixed;
+
+            bottom:0;
+
+            left:0;
+
+            width:100%;
+
+            background:#111;
+
+            border-top:1px solid #333;
+
+            padding:15px 25px;
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            z-index:999;
+        }
+
+        .now-playing{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:15px;
+        }
+
+        .now-playing img{
+
+            width:60px;
+
+            height:60px;
+
+            border-radius:15px;
+        }
+
+        .player-controls i{
+
+            font-size:24px;
+
+            margin:0 18px;
+
+            cursor:pointer;
+
+            transition:0.3s;
+        }
+
+        .player-controls i:hover{
+
+            color:#9d6bff;
+        }
+
+        .main-play{
+
+            font-size:36px !important;
+
+            color:#9d6bff;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:768px){
+
+            .song-card{
+
+                flex-direction:column;
+
+                align-items:flex-start;
+
+                gap:15px;
+            }
+
+            .song-actions{
+
+                width:100%;
+
+                display:flex;
+
+                justify-content:flex-end;
+            }
+
+            .player-bar{
+
+                flex-direction:column;
+
+                gap:15px;
+            }
+
+            .playlist-name{
+
+                font-size:32px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav class="navbar navbar-expand-lg navbar-dark px-4">
+
+    <div class="container-fluid">
+
+        <a class="navbar-brand animate__animated animate__fadeInLeft"
+           href="#">
+
+            AURA
+
+        </a>
+
+        <button class="btn btn-outline-light">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back
+
+        </button>
+
+    </div>
+
+</nav>
+
+<!-- MAIN CONTAINER -->
+
+<div class="container">
+
+    <!-- PLAYLIST HEADER -->
+
+    <div class="playlist-header animate__animated animate__fadeIn">
+
+        <h1 class="playlist-name"
+            th:text="${playlist.name}">
+
+            Chill Vibes
+
+        </h1>
+
+        <p class="playlist-info">
+
+            Total Songs:
+            <span th:text="${#lists.size(playlist.songs)}">
+                15
+            </span>
+
+        </p>
+
+    </div>
+
+    <!-- SONG LIST -->
+
+    <div th:each="song : ${playlist.songs}"
+
+         th:class="${song.playing} ?
+         'song-card playing animate__animated animate__fadeInUp'
+         :
+         'song-card animate__animated animate__fadeInUp'">
+
+        <!-- SONG INFO -->
+
+        <div class="song-info">
+
+            <img th:src="${song.imageUrl}"
+                 src="https://picsum.photos/200">
+
+            <div>
+
+                <div class="song-title">
+
+                    <span th:text="${song.title}">
+                        Perfect
+                    </span>
+
+                    <!-- CURRENTLY PLAYING ICON -->
+
+                    <i th:if="${song.playing}"
+                       class="fa-solid fa-wave-square playing-animation"></i>
+
+                </div>
+
+                <div class="artist"
+                     th:text="${song.artist}">
+
+                    Ed Sheeran
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SONG ACTIONS -->
+
+        <div class="song-actions">
+
+            <!-- PLAY SONG -->
+
+            <i class="fa-solid fa-circle-play play-btn"
+               title="Play Song"></i>
+
+            <!-- REMOVE SONG -->
+
+            <i class="fa-solid fa-trash delete-btn"
+               title="Remove Song"></i>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- PLAYER BAR -->
+
+<div class="player-bar">
+
+    <!-- NOW PLAYING -->
+
+    <div class="now-playing">
+
+        <img src="https://picsum.photos/200">
+
+        <div>
+
+            <div class="fw-bold">
+                Perfect
+            </div>
+
+            <small class="text-secondary">
+                Ed Sheeran
+            </small>
+
+        </div>
+
+    </div>
+
+    <!-- PLAYER CONTROLS -->
+
+    <div class="player-controls">
+
+        <i class="fa-solid fa-backward-step"></i>
+
+        <i class="fa-solid fa-circle-play main-play"></i>
+
+        <i class="fa-solid fa-forward-step"></i>
+
+    </div>
+
+</div>
+
+<!-- Bootstrap -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

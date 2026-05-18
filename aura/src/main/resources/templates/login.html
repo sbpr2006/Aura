@@ -1,0 +1,1398 @@
+
+
+Yes — send me the features you want in the music streaming platform, such as:
+
+Navbar items
+
+Login/signup
+
+Music player
+
+Playlist section
+
+Albums/artists
+
+Search bar
+
+Sidebar
+
+Dark mode
+
+Recently played
+
+Trending songs
+
+Audio controls
+
+Responsive/mobile design
+
+Premium section
+
+Lyrics section
+
+Footer
+
+Also mention:
+
+Preferred color theme
+
+Whether you want only HTML or HTML + CSS + JavaScript
+
+Single page or multiple pages
+
+Then I’ll generate the complete code for you.
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Music Streaming Platform</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:#121212;
+            color:white;
+            padding-bottom:140px;
+        }
+
+        /* HEADER */
+        header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:20px;
+            background:#1e1e1e;
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+
+        .logo{
+            font-size:24px;
+            font-weight:bold;
+            color:#1db954;
+        }
+
+        .profile{
+            width:45px;
+            height:45px;
+            border-radius:50%;
+            background:#1db954;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            cursor:pointer;
+            font-size:20px;
+        }
+
+        /* SECTION TITLE */
+        .section-title{
+            padding:20px;
+            font-size:22px;
+            font-weight:bold;
+        }
+
+        /* SONG CARDS */
+        .songs-container,
+        .playlist-container,
+        .artist-container{
+            display:flex;
+            overflow-x:auto;
+            gap:15px;
+            padding:0 20px 20px;
+        }
+
+        .songs-container::-webkit-scrollbar,
+        .playlist-container::-webkit-scrollbar,
+        .artist-container::-webkit-scrollbar{
+            display:none;
+        }
+
+        .card{
+            min-width:170px;
+            background:#1e1e1e;
+            border-radius:15px;
+            padding:15px;
+            transition:0.3s;
+            cursor:pointer;
+        }
+
+        .card:hover{
+            transform:scale(1.05);
+            background:#2a2a2a;
+        }
+
+        .card img{
+            width:100%;
+            height:150px;
+            object-fit:cover;
+            border-radius:10px;
+        }
+
+        .card h3{
+            margin-top:10px;
+            font-size:18px;
+        }
+
+        .card p{
+            margin-top:5px;
+            color:#b3b3b3;
+            font-size:14px;
+        }
+
+        /* ARTIST */
+        .artist-card{
+            text-align:center;
+            min-width:120px;
+        }
+
+        .artist-card img{
+            width:100px;
+            height:100px;
+            border-radius:50%;
+            object-fit:cover;
+            border:3px solid #1db954;
+        }
+
+        .artist-card h4{
+            margin-top:10px;
+        }
+
+        /* PLAYER BAR */
+        .player-bar{
+            position:fixed;
+            bottom:70px;
+            width:100%;
+            background:#181818;
+            padding:15px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border-top:1px solid #333;
+        }
+
+        .song-info{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .song-info img{
+            width:55px;
+            height:55px;
+            border-radius:10px;
+        }
+
+        .controls{
+            display:flex;
+            gap:20px;
+            font-size:22px;
+        }
+
+        .controls i{
+            cursor:pointer;
+        }
+
+        .play-btn{
+            color:#1db954;
+        }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav{
+            position:fixed;
+            bottom:0;
+            width:100%;
+            background:#000;
+            display:flex;
+            justify-content:space-around;
+            padding:15px 0;
+            border-top:1px solid #222;
+        }
+
+        .nav-item{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            color:#b3b3b3;
+            font-size:14px;
+            cursor:pointer;
+        }
+
+        .nav-item i{
+            font-size:22px;
+            margin-bottom:5px;
+        }
+
+        .nav-item:hover{
+            color:#1db954;
+        }
+
+        /* MOBILE */
+        @media(max-width:768px){
+
+            .card{
+                min-width:140px;
+            }
+
+            .card img{
+                height:120px;
+            }
+
+            .player-bar{
+                flex-direction:column;
+                gap:10px;
+                text-align:center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">Musicify</div>
+
+        <div class="profile">
+            <i class="fa-solid fa-user"></i>
+        </div>
+    </header>
+
+    <!-- TRENDING SONGS -->
+    <div class="section-title">Top Trending Songs</div>
+
+    <div class="songs-container">
+
+        <div class="card">
+            <img src="https://picsum.photos/200?1">
+            <h3>Night Changes</h3>
+            <p>One Direction</p>
+        </div>
+
+        <div class="card">
+            <img src="https://picsum.photos/200?2">
+            <h3>Perfect</h3>
+            <p>Ed Sheeran</p>
+        </div>
+
+        <div class="card">
+            <img src="https://picsum.photos/200?3">
+            <h3>Believer</h3>
+            <p>Imagine Dragons</p>
+        </div>
+
+        <div class="card">
+            <img src="https://picsum.photos/200?4">
+            <h3>Shape Of You</h3>
+            <p>Ed Sheeran</p>
+        </div>
+
+    </div>
+
+    <!-- TRENDING PLAYLISTS -->
+    <div class="section-title">Trending Playlists</div>
+
+    <div class="playlist-container">
+
+        <div class="card">
+            <img src="https://picsum.photos/200?5">
+            <h3>Top Hits</h3>
+            <p>50 Songs</p>
+        </div>
+
+        <div class="card">
+            <img src="https://picsum.photos/200?6">
+            <h3>Workout Mix</h3>
+            <p>40 Songs</p>
+        </div>
+
+        <div class="card">
+            <img src="https://picsum.photos/200?7">
+            <h3>Chill Vibes</h3>
+            <p>35 Songs</p>
+        </div>
+
+    </div>
+
+    <!-- ARTISTS -->
+    <div class="section-title">Popular Artists</div>
+
+    <div class="artist-container">
+
+        <div class="artist-card">
+            <img src="https://picsum.photos/200?8">
+            <h4>Arijit</h4>
+        </div>
+
+        <div class="artist-card">
+            <img src="https://picsum.photos/200?9">
+            <h4>Sid Sriram</h4>
+        </div>
+
+        <div class="artist-card">
+            <img src="https://picsum.photos/200?10">
+            <h4>Shreya</h4>
+        </div>
+
+        <div class="artist-card">
+            <img src="https://picsum.photos/200?11">
+            <h4>Atif Aslam</h4>
+        </div>
+
+    </div>
+
+    <!-- PLAYER BAR -->
+    <div class="player-bar">
+
+        <div class="song-info">
+            <img src="https://picsum.photos/200?12">
+            <div>
+                <h4>Perfect</h4>
+                <p>Ed Sheeran</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <i class="fa-solid fa-backward-step"></i>
+            <i class="fa-solid fa-circle-play play-btn"></i>
+            <i class="fa-solid fa-forward-step"></i>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="bottom-nav">
+
+        <div class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </div>
+
+        <div class="nav-item">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Search</span>
+        </div>
+
+        <div class="nav-item">
+            <i class="fa-solid fa-music"></i>
+            <span>Playlists</span>
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+BEAUTIFY USING THEMELEAF AND BOOTSTRAP
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Streaming Platform</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+    <style>
+
+        body{
+            background: linear-gradient(to bottom,#121212,#1c1c1c);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            padding-bottom: 150px;
+        }
+
+        /* NAVBAR */
+
+        .navbar{
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand{
+            font-size: 28px;
+            font-weight: bold;
+            color: #1DB954 !important;
+        }
+
+        .profile-icon{
+            width: 45px;
+            height: 45px;
+            background: #1DB954;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* SECTION */
+
+        .section-title{
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* CARDS */
+
+        .music-card{
+            background: #181818;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .music-card:hover{
+            transform: translateY(-8px);
+            background: #242424;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .music-card img{
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .music-card .card-body{
+            color: white;
+        }
+
+        .music-card h5{
+            font-weight: bold;
+        }
+
+        .music-card p{
+            color: #b3b3b3;
+        }
+
+        /* ARTIST */
+
+        .artist-card{
+            text-align: center;
+        }
+
+        .artist-card img{
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 4px solid #1DB954;
+            object-fit: cover;
+            transition: 0.3s;
+        }
+
+        .artist-card img:hover{
+            transform: scale(1.08);
+        }
+
+        /* PLAYER BAR */
+
+        .player-bar{
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            width: 100%;
+            background: #111;
+            border-top: 1px solid #333;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .song-details{
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .song-details img{
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+        }
+
+        .controls i{
+            font-size: 24px;
+            margin: 0 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .controls i:hover{
+            color: #1DB954;
+        }
+
+        .play-btn{
+            font-size: 35px !important;
+            color: #1DB954;
+        }
+
+        /* BOTTOM NAVIGATION */
+
+        .bottom-nav{
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            border-top: 1px solid #222;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .bottom-nav a{
+            color: #b3b3b3;
+            text-decoration: none;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .bottom-nav a:hover{
+            color: #1DB954;
+        }
+
+        .bottom-nav i{
+            font-size: 22px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:768px){
+
+            .player-bar{
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .song-details{
+                text-align: center;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top px-3">
+
+    <div class="container-fluid">
+
+        <a class="navbar-brand" href="#">Musicify</a>
+
+        <div class="profile-icon">
+            <i class="fa-solid fa-user"></i>
+        </div>
+
+    </div>
+
+</nav>
+
+<!-- MAIN CONTENT -->
+
+<div class="container mt-4">
+
+    <!-- TRENDING SONGS -->
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="section-title">Top Trending Songs</h2>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-3 col-sm-6"
+             th:each="song : ${songs}">
+
+            <div class="card music-card">
+
+                <img th:src="${song.image}"
+                     src="https://picsum.photos/300?1"
+                     class="card-img-top">
+
+                <div class="card-body">
+
+                    <h5 th:text="${song.name}">Perfect</h5>
+
+                    <p th:text="${song.artist}">
+                        Ed Sheeran
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PLAYLISTS -->
+
+    <div class="mt-5 mb-3">
+        <h2 class="section-title">Trending Playlists</h2>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-4"
+             th:each="playlist : ${playlists}">
+
+            <div class="card music-card">
+
+                <img th:src="${playlist.image}"
+                     src="https://picsum.photos/300?2"
+                     class="card-img-top">
+
+                <div class="card-body">
+
+                    <h5 th:text="${playlist.name}">
+                        Chill Vibes
+                    </h5>
+
+                    <p th:text="${playlist.count}">
+                        40 Songs
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ARTISTS -->
+
+    <div class="mt-5 mb-4">
+        <h2 class="section-title">Popular Artists</h2>
+    </div>
+
+    <div class="row text-center g-4">
+
+        <div class="col-md-3 col-6"
+             th:each="artist : ${artists}">
+
+            <div class="artist-card">
+
+                <img th:src="${artist.image}"
+                     src="https://picsum.photos/200?3">
+
+                <h5 class="mt-3"
+                    th:text="${artist.name}">
+                    Arijit Singh
+                </h5>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- PLAYER BAR -->
+
+<div class="player-bar">
+
+    <div class="song-details">
+
+        <img src="https://picsum.photos/200?4">
+
+        <div>
+            <h6 class="mb-0">Perfect</h6>
+            <small class="text-secondary">
+                Ed Sheeran
+            </small>
+        </div>
+
+    </div>
+
+    <div class="controls">
+
+        <i class="fa-solid fa-backward-step"></i>
+
+        <i class="fa-solid fa-circle-play play-btn"></i>
+
+        <i class="fa-solid fa-forward-step"></i>
+
+    </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom-nav">
+
+    <a href="#">
+        <i class="fa-solid fa-house"></i>
+        Home
+    </a>
+
+    <a href="#">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Search
+    </a>
+
+    <a href="#">
+        <i class="fa-solid fa-music"></i>
+        Playlists
+    </a>
+
+</div>
+
+<!-- Bootstrap JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+
+login page contain:
+Email/username field
+Password field
+Remember me checkbox
+Forgot password
+Login button
+Register link
+Background image/music theme
+Bootstrap + Thymeleaf support
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Musicify - Login</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-family:'Segoe UI',sans-serif;
+
+            /* MUSIC THEME BACKGROUND */
+            background:
+                    linear-gradient(rgba(0,0,0,0.7),
+                    rgba(0,0,0,0.8)),
+                    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1470&auto=format&fit=crop');
+
+            background-size:cover;
+            background-position:center;
+            overflow:hidden;
+        }
+
+        /* LOGIN CARD */
+
+        .login-card{
+            width:100%;
+            max-width:420px;
+
+            background:rgba(18,18,18,0.88);
+            backdrop-filter:blur(12px);
+
+            border-radius:25px;
+            padding:40px;
+
+            box-shadow:0 10px 30px rgba(0,0,0,0.6);
+
+            color:white;
+        }
+
+        .brand-logo{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .brand-logo i{
+            font-size:55px;
+            color:#1DB954;
+        }
+
+        .brand-logo h2{
+            margin-top:10px;
+            font-weight:bold;
+            color:#1DB954;
+        }
+
+        /* FORM */
+
+        .form-control{
+            background:#222;
+            border:none;
+            color:white;
+            padding:14px;
+            border-radius:12px;
+        }
+
+        .form-control:focus{
+            background:#2d2d2d;
+            color:white;
+            border:1px solid #1DB954;
+            box-shadow:none;
+        }
+
+        .input-group-text{
+            background:#222;
+            border:none;
+            color:#1DB954;
+            border-radius:12px 0 0 12px;
+        }
+
+        .form-check-input:checked{
+            background-color:#1DB954;
+            border-color:#1DB954;
+        }
+
+        .forgot-password{
+            color:#1DB954;
+            text-decoration:none;
+            font-size:14px;
+        }
+
+        .forgot-password:hover{
+            text-decoration:underline;
+        }
+
+        /* BUTTON */
+
+        .login-btn{
+            width:100%;
+            padding:12px;
+            border:none;
+            border-radius:12px;
+            background:#1DB954;
+            color:white;
+            font-size:18px;
+            font-weight:bold;
+            transition:0.3s;
+        }
+
+        .login-btn:hover{
+            background:#17a74a;
+            transform:scale(1.02);
+        }
+
+        /* REGISTER */
+
+        .register-text{
+            text-align:center;
+            margin-top:20px;
+            color:#b3b3b3;
+        }
+
+        .register-text a{
+            color:#1DB954;
+            text-decoration:none;
+            font-weight:bold;
+        }
+
+        .register-text a:hover{
+            text-decoration:underline;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:500px){
+
+            .login-card{
+                margin:20px;
+                padding:30px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="login-card">
+
+    <!-- LOGO -->
+
+    <div class="brand-logo">
+
+        <i class="fa-solid fa-music"></i>
+
+        <h2>Musicify</h2>
+
+        <p class="text-secondary">
+            Feel the Beat 🎵
+        </p>
+
+    </div>
+
+    <!-- LOGIN FORM -->
+
+    <form th:action="@{/login}" method="post">
+
+        <!-- EMAIL / USERNAME -->
+
+        <div class="mb-4">
+
+            <label class="form-label">
+                Email / Username
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+
+                <input type="text"
+                       name="username"
+                       class="form-control"
+                       placeholder="Enter email or username"
+                       required>
+
+            </div>
+
+        </div>
+
+        <!-- PASSWORD -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Password
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="fa-solid fa-lock"></i>
+                </span>
+
+                <input type="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Enter password"
+                       required>
+
+            </div>
+
+        </div>
+
+        <!-- REMEMBER + FORGOT -->
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div class="form-check">
+
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="rememberMe">
+
+                <label class="form-check-label"
+                       for="rememberMe">
+
+                    Remember Me
+
+                </label>
+
+            </div>
+
+            <a href="#"
+               class="forgot-password">
+
+                Forgot Password?
+
+            </a>
+
+        </div>
+
+        <!-- LOGIN BUTTON -->
+
+        <button type="submit"
+                class="login-btn">
+
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Login
+
+        </button>
+
+        <!-- REGISTER -->
+
+        <div class="register-text">
+
+            Don't have an account?
+
+            <a th:href="@{/register}" href="#">
+                Register
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+<!-- Bootstrap JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+
+and app name is aura
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AURA - Music Streaming</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-family:'Segoe UI',sans-serif;
+
+            background:
+                    linear-gradient(rgba(0,0,0,0.75),
+                    rgba(0,0,0,0.85)),
+                    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1470&auto=format&fit=crop');
+
+            background-size:cover;
+            background-position:center;
+            overflow:hidden;
+        }
+
+        /* LOGIN CARD */
+
+        .login-card{
+            width:100%;
+            max-width:430px;
+
+            background:rgba(18,18,18,0.88);
+            backdrop-filter:blur(15px);
+
+            border-radius:28px;
+            padding:42px;
+
+            box-shadow:0 10px 40px rgba(0,0,0,0.6);
+
+            color:white;
+        }
+
+        /* BRAND */
+
+        .brand-logo{
+            text-align:center;
+            margin-bottom:35px;
+        }
+
+        .brand-logo i{
+            font-size:60px;
+            color:#8b5cf6;
+        }
+
+        .brand-logo h1{
+            margin-top:12px;
+            font-size:42px;
+            font-weight:800;
+            letter-spacing:3px;
+            color:#ffffff;
+        }
+
+        .brand-logo p{
+            color:#b3b3b3;
+            font-size:15px;
+        }
+
+        /* FORM */
+
+        .form-label{
+            margin-bottom:8px;
+            color:#d1d1d1;
+        }
+
+        .form-control{
+            background:#222;
+            border:none;
+            color:white;
+            padding:14px;
+            border-radius:12px;
+        }
+
+        .form-control:focus{
+            background:#2c2c2c;
+            color:white;
+            border:1px solid #8b5cf6;
+            box-shadow:none;
+        }
+
+        .input-group-text{
+            background:#222;
+            border:none;
+            color:#8b5cf6;
+            border-radius:12px 0 0 12px;
+        }
+
+        .form-check-input:checked{
+            background-color:#8b5cf6;
+            border-color:#8b5cf6;
+        }
+
+        .forgot-password{
+            color:#8b5cf6;
+            text-decoration:none;
+            font-size:14px;
+        }
+
+        .forgot-password:hover{
+            text-decoration:underline;
+        }
+
+        /* BUTTON */
+
+        .login-btn{
+            width:100%;
+            padding:13px;
+            border:none;
+            border-radius:14px;
+
+            background:linear-gradient(to right,#8b5cf6,#7c3aed);
+
+            color:white;
+            font-size:18px;
+            font-weight:bold;
+
+            transition:0.3s;
+        }
+
+        .login-btn:hover{
+            transform:scale(1.03);
+            box-shadow:0 0 15px rgba(139,92,246,0.6);
+        }
+
+        /* REGISTER */
+
+        .register-text{
+            text-align:center;
+            margin-top:22px;
+            color:#b3b3b3;
+        }
+
+        .register-text a{
+            color:#8b5cf6;
+            text-decoration:none;
+            font-weight:bold;
+        }
+
+        .register-text a:hover{
+            text-decoration:underline;
+        }
+
+        /* MOBILE */
+
+        @media(max-width:500px){
+
+            .login-card{
+                margin:20px;
+                padding:30px;
+            }
+
+            .brand-logo h1{
+                font-size:34px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="login-card">
+
+    <!-- BRAND -->
+
+    <div class="brand-logo">
+
+        <i class="fa-solid fa-headphones"></i>
+
+        <h1>AURA</h1>
+
+        <p>
+            Immerse Yourself in Music 🎵
+        </p>
+
+    </div>
+
+    <!-- LOGIN FORM -->
+
+    <form th:action="@{/login}" method="post">
+
+        <!-- EMAIL / USERNAME -->
+
+        <div class="mb-4">
+
+            <label class="form-label">
+                Email / Username
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+
+                <input type="text"
+                       name="username"
+                       class="form-control"
+                       placeholder="Enter email or username"
+                       required>
+
+            </div>
+
+        </div>
+
+        <!-- PASSWORD -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Password
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="fa-solid fa-lock"></i>
+                </span>
+
+                <input type="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Enter your password"
+                       required>
+
+            </div>
+
+        </div>
+
+        <!-- REMEMBER + FORGOT -->
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div class="form-check">
+
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="rememberMe">
+
+                <label class="form-check-label"
+                       for="rememberMe">
+
+                    Remember Me
+
+                </label>
+
+            </div>
+
+            <a href="#"
+               class="forgot-password">
+
+                Forgot Password?
+
+            </a>
+
+        </div>
+
+        <!-- LOGIN BUTTON -->
+
+        <button type="submit"
+                class="login-btn">
+
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Login to AURA
+
+        </button>
+
+        <!-- REGISTER -->
+
+        <div class="register-text">
+
+            New to AURA?
+
+            <a th:href="@{/register}" href="#">
+                Create Account
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+<!-- Bootstrap JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+

@@ -8,10 +8,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Entity
 @Data
+@AllArgsConstructor
+@Builder
 @Table(name = "playlists")
 public class Playlists {
 
@@ -27,27 +31,5 @@ public class Playlists {
     @Column(name = "playlist_name", nullable = false, length = 200)
     private String playlistName;
 
-    // Default Constructor
-    public Playlists() {
-    }
-
-    // Parameterized Constructor
-    public Playlists(Users user, String playlistName) {
-        this.user = user;
-        this.playlistName = playlistName;
-    }
-
-    // Getters and Setters
-    public Long getPlaylistId() { return playlistId; } 
-    public void setPlaylistId(Long playlistId) { this.playlistId = playlistId; }
-
-    public Users getUser() { return user; } 
-    public void setUser(Users user) { this.user = user; }
-
-    public String getPlaylistName() { return playlistName; } 
-    public void setPlaylistName(String playlistName) { this.playlistName = playlistName; }
-
-   
-
-
+    
 }

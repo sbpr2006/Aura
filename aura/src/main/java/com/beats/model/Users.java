@@ -9,10 +9,12 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Users {
@@ -22,13 +24,12 @@ public class Users {
     private Long userId;
     
     @Column(nullable = false, length = 150)
-    private String uname;
+    private String username;
 
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
     @Column(nullable = false, length = 255)
     private String password;
-
 
 }

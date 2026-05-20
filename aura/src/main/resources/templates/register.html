@@ -183,7 +183,8 @@
 
     <!-- REGISTER FORM -->
 
-    <form th:action="@{/addUser}" method="post">
+	<form th:action="@{/usr/addUser}" method="post">
+
 
         <!-- FULL NAME -->
 
@@ -300,9 +301,7 @@
         <div class="login-text">
             Already have an account?
 
-            <a th:href="@{/login}">
-                Login
-            </a>
+            <a href="/usr/loginPage">Login</a>
         </div>
 
     </form>

@@ -1,5 +1,7 @@
 package com.beats.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,9 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.beats.model.Playlists;
+import com.beats.model.Songs;
 import com.beats.model.Users;
 import com.beats.repository.MusicRepository;
-import com.beats.services.MusicServices;
+import com.beats.services.PlaylistService;
+import com.beats.services.SongServices;
 import com.beats.services.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -19,7 +24,9 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/usr")
 public class MusicController {
 	@Autowired(required=true)
-	MusicServices musicServices;
+	SongServices songServices;
+	@Autowired
+	PlaylistService playlistService;
 	@Autowired
 	MusicRepository musicRepo;
 	@Autowired
@@ -39,7 +46,7 @@ public class MusicController {
             session.setMaxInactiveInterval(30 * 60);
             model.addAttribute("message", "Registration Successful!");
             model.addAttribute("messageType", "success");
-            return "index";
+            return "redirect:/usr/home";
         } catch (Exception e) {
             model.addAttribute("message",e.getMessage());
             model.addAttribute("messageType", "error");
@@ -55,14 +62,13 @@ public class MusicController {
                             HttpSession session, Model model) {
         try {
         	Users user =  userService.findByUsernameAndPassword(username,password);
-        	System.out.println(user);
         	if(user != null &&
         	   user.getPassword().equals(password)) {
                 session.setAttribute("loggedUser", user);
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("email", user.getEmail());
                 session.setMaxInactiveInterval(30 * 60);
-                return "index";
+                return "redirect:/usr/home";
             }
             model.addAttribute("message", "Invalid Username or Password");
             model.addAttribute("messageType", "error");
@@ -77,7 +83,128 @@ public class MusicController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/login";
+        return "redirect:/usr/loginPage";
     }
+    
+    @GetMapping("/home")
+    public String homePage(Model model, HttpSession session) {
+    	List<Songs> songs =songServices.getTrendingSongs();
+    	List<Playlists> playlists=playlistService.getTrendingPlaylists();
+    	System.out.println(playlists);
+        model.addAttribute("songs",songs );
+        model.addAttribute("playlists", playlists);
+        //model.addAttribute("artists", songServices.getPopularArtists());
+        return "index.html"; 
+    }
+    
+    @GetMapping("/profile")
+    public String settings(HttpSession session, Model model) {
+        Users user = (Users) session.getAttribute("loggedUser");
+        // check if user logged in
+        if(user == null) { return "redirect:/usr/loginPage";}
+        model.addAttribute("user", user);
+        return "settings";
+    }
+    
+    @PostMapping("/updateProfile")
+    public String updateProfile(
 
+            @RequestParam String name,
+            @RequestParam String username,
+            @RequestParam String email,
+            @RequestParam String bio,
+            HttpSession session,
+            Model model) {
+    	
+        try{
+
+            Users user=(Users)session.getAttribute("loggedUser");
+            if(user == null) return "redirect:/usr/loginPage";
+
+            // UPDATE USER DETAILS
+            user.setName(name);
+            user.setUsername(username);
+            user.setEmail(email);
+            user.setBio(bio);
+
+            // SAVE
+            Users updatedUser=userService.saveUser(user);
+
+            // UPDATE SESSION
+            session.setAttribute("loggedUser", updatedUser);
+            session.setAttribute("username", updatedUser.getUsername());
+            session.setAttribute("email", updatedUser.getEmail());
+
+            model.addAttribute("user", updatedUser);
+            model.addAttribute("success", "Profile Updated Successfully");
+            return "settings";
+
+        } catch(Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "settings";
+        }
+    }
+    
+    @PostMapping("/changePassword")
+    public String changePassword(
+
+            @RequestParam String currentPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword,
+
+            HttpSession session,
+            Model model) {
+
+        Users user =
+            (Users) session.getAttribute("loggedUser");
+
+        if(user == null) {
+            return "redirect:/usr/loginPage";
+        }
+
+        // WRONG CURRENT PASSWORD
+
+        if(!user.getPassword().equals(currentPassword)) {
+
+            model.addAttribute("user", user);
+
+            model.addAttribute("error",
+                    "Current Password Incorrect");
+
+            return "settings";
+        }
+
+        // PASSWORDS NOT MATCHING
+
+        if(!newPassword.equals(confirmPassword)) {
+
+            model.addAttribute("user", user);
+
+            model.addAttribute("error",
+                    "Passwords Do Not Match");
+
+            return "settings";
+        }
+
+        // UPDATE PASSWORD ONLY HERE
+
+        user.setPassword(newPassword);
+
+        userService.saveUser(user);
+
+        // UPDATE SESSION
+
+        session.setAttribute("loggedUser", user);
+
+        model.addAttribute("user", user);
+
+        model.addAttribute("success",
+                "Password Updated Successfully");
+
+        return "settings";
+    }
+    @GetMapping("/playlist")
+    public String playlist() { return "playlists.html"; }
+    @GetMapping("/search")
+    public String search() { return "search.html"; }
 }

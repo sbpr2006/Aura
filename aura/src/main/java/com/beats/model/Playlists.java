@@ -11,9 +11,11 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "playlists")
@@ -31,5 +33,6 @@ public class Playlists {
     @Column(name = "playlist_name", nullable = false, length = 200)
     private String playlistName;
 
-    
+    @Column
+    private int playedCount;
 }

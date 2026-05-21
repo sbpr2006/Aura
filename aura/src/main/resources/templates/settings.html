@@ -28,6 +28,47 @@
             font-family:'Segoe UI',sans-serif;
             min-height:100vh;
         }
+		 
+		/*		LOGOUT BUTTON			*/
+		.logout-btn-fixed{
+
+		    position:fixed;
+
+		    bottom:25px;
+		    right:25px;
+
+		    width:65px;
+		    height:65px;
+
+		    border-radius:50%;
+
+		    background:linear-gradient(to right,#ff4b4b,#ff1f1f);
+
+		    display:flex;
+		    justify-content:center;
+		    align-items:center;
+
+		    color:white;
+
+		    font-size:24px;
+
+		    text-decoration:none;
+
+		    box-shadow:0 0 18px rgba(255,0,0,0.5);
+
+		    z-index:9999;
+
+		    transition:0.3s;
+		}
+
+		.logout-btn-fixed:hover{
+
+		    transform:scale(1.08);
+
+		    color:white;
+
+		    box-shadow:0 0 25px rgba(255,0,0,0.9);
+		}
 
         /* NAVBAR */
 
@@ -197,6 +238,61 @@
                 padding:25px;
             }
         }
+		
+		/* NOW PLAYING DISK */
+
+		.now-playing-disk{
+
+		    position:fixed;
+
+		    bottom:25px;
+		    left:25px;
+
+		    width:75px;
+		    height:75px;
+
+		    border-radius:50%;
+
+		    overflow:hidden;
+
+		    border:4px solid #8b5cf6;
+
+		    box-shadow:0 0 18px rgba(139,92,246,0.7);
+
+		    z-index:9999;
+
+		    animation:spinDisk 6s linear infinite;
+
+		    transition:0.3s;
+		}
+
+		.now-playing-disk:hover{
+
+		    transform:scale(1.08);
+
+		    box-shadow:0 0 25px rgba(139,92,246,1);
+		}
+
+		.now-playing-disk img{
+
+		    width:100%;
+		    height:100%;
+
+		    object-fit:cover;
+		}
+
+		/* ROTATING EFFECT */
+
+		@keyframes spinDisk{
+
+		    from{
+		        transform:rotate(0deg);
+		    }
+
+		    to{
+		        transform:rotate(360deg);
+		    }
+		}
 
     </style>
 </head>
@@ -213,14 +309,48 @@
             AURA
         </a>
 
-        <button class="btn btn-outline-light">
+		<a href="/usr/home" class="btn btn-outline-light">
             <i class="fa-solid fa-arrow-left"></i>
             Back
-        </button>
+        </a>
 
     </div>
 
 </nav>
+
+<!-- SUCCESS MESSAGE -->
+
+<div th:if="${success}"
+     class="alert alert-success alert-dismissible fade show mt-3"
+     role="alert">
+
+    <i class="fa-solid fa-circle-check"></i>
+
+    <span th:text="${success}"></span>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+    </button>
+
+</div>
+
+<!-- ERROR MESSAGE -->
+
+<div th:if="${error}"
+     class="alert alert-danger alert-dismissible fade show mt-3"
+     role="alert">
+
+    <i class="fa-solid fa-circle-exclamation"></i>
+
+    <span th:text="${error}"></span>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+    </button>
+
+</div>
 
 <!-- PROFILE -->
 
@@ -243,138 +373,260 @@
 
             </div>
 
-            <h2 th:text="${user.name}">
-                Prakash
+            <h2 th:text="${user.username}">
             </h2>
 
             <p th:text="${user.email}">
-                prakash@gmail.com
             </p>
 
         </div>
 
-        <!-- USER INFO -->
+		<!-- USER INFO -->
 
-        <h4 class="section-title">
-            User Information
-        </h4>
+		<h4 class="section-title">
+		    User Information
+		</h4>
 
-        <form>
+		<form th:action="@{/usr/updateProfile}"
+		      method="post">
 
-            <div class="row">
+		    <div class="row">
 
-                <div class="col-md-6 mb-3">
+		        <!-- FULL NAME -->
 
-                    <label class="form-label">
-                        Full Name
-                    </label>
+		        <div class="col-md-6 mb-3">
 
-                    <input type="text"
-                           class="form-control"
-                           value="Prakash">
+		            <label class="form-label">
+		                Full Name
+		            </label>
 
-                </div>
+		            <input type="text"
+		                   name="name"
+		                   class="form-control"
+		                   th:value="${user.name}">
 
-                <div class="col-md-6 mb-3">
+		        </div>
 
-                    <label class="form-label">
-                        Username
-                    </label>
+		        <!-- USERNAME -->
 
-                    <input type="text"
-                           class="form-control"
-                           value="prakash123">
+		        <div class="col-md-6 mb-3">
 
-                </div>
+		            <label class="form-label">
+		                Username
+		            </label>
 
-            </div>
+		            <input type="text"
+		                   name="username"
+		                   class="form-control"
+		                   th:value="${user.username}">
 
-            <div class="mb-3">
+		        </div>
 
-                <label class="form-label">
-                    Email Address
-                </label>
+		    </div>
 
-                <input type="email"
-                       class="form-control"
-                       value="prakash@gmail.com">
+		    <!-- EMAIL -->
 
-            </div>
+		    <div class="mb-3">
 
-            <div class="mb-4">
+		        <label class="form-label">
+		            Email Address
+		        </label>
 
-                <label class="form-label">
-                    Bio
-                </label>
+		        <input type="email"
+		               name="email"
+		               class="form-control"
+		               th:value="${user.email}">
 
-                <textarea class="form-control"
-                          rows="3">Music lover 🎵</textarea>
+		    </div>
 
-            </div>
+		    <!-- BIO -->
 
-            <button class="btn btn-aura">
-                <i class="fa-solid fa-pen"></i>
-                Edit Profile
-            </button>
+		    <div class="mb-4">
 
-        </form>
+		        <label class="form-label">
+		            Bio
+		        </label>
 
+		        <textarea class="form-control"
+		                  name="bio"
+		                  rows="3"
+		                  th:text="${user.bio}"></textarea>
+
+		    </div>
+
+		    <!-- BUTTON -->
+
+		    <button type="submit"
+		            class="btn btn-aura">
+
+		        <i class="fa-solid fa-floppy-disk"></i>
+
+		        Save Profile
+
+		    </button>
+
+		</form>
         <!-- CHANGE PASSWORD -->
 
         <h4 class="section-title mt-5">
             Change Password
         </h4>
 
-        <form>
+		<form th:action="@{/usr/changePassword}"
+		      method="post">
 
-            <div class="mb-3">
+		    <!-- CURRENT PASSWORD -->
+			<form th:action="@{/usr/changePassword}"
+			      method="post">
 
-                <label class="form-label">
-                    Current Password
-                </label>
+			    <input type="password"
+			           name="currentPassword"
+			           placeholder="Current Password"
+			           class="form-control mb-3"
+			           required>
 
-                <input type="password"
-                       class="form-control">
+			    <input type="password"
+			           name="newPassword"
+			           placeholder="New Password"
+			           class="form-control mb-3"
+			           required>
 
-            </div>
+			    <input type="password"
+			           name="confirmPassword"
+			           placeholder="Confirm Password"
+			           class="form-control mb-3"
+			           required>
 
-            <div class="mb-3">
+			    <button type="submit"
+			            class="btn btn-aura">
 
-                <label class="form-label">
-                    New Password
-                </label>
+			        Update Password
 
-                <input type="password"
-                       class="form-control">
+			    </button>
 
-            </div>
-
-            <div class="mb-4">
-
-                <label class="form-label">
-                    Confirm New Password
-                </label>
-
-                <input type="password"
-                       class="form-control">
-
-            </div>
-
-            <button class="btn btn-aura">
-                <i class="fa-solid fa-key"></i>
-                Update Password
-            </button>
-
-        </form>
+			</form>
 
         <!-- ACCOUNT SETTINGS -->
+		<!--/*
+		        <h4 class="section-title mt-5">
+		            Account Settings
+		        </h4>
+
+		        <!-- NOTIFICATIONS
+		        <div class="settings-box">
+
+		            <h5>
+		                Notification Preferences
+		            </h5>
+
+		            <div class="form-check mt-3">
+
+		                <input class="form-check-input"
+		                       type="checkbox"
+		                       checked>
+
+		                <label class="form-check-label">
+		                    Email Notifications
+		                </label>
+
+		            </div>
+
+		            <div class="form-check mt-2">
+
+		                <input class="form-check-input"
+		                       type="checkbox"
+		                       checked>
+
+		                <label class="form-check-label">
+		                    Push Notifications
+		                </label>
+
+		            </div>
+
+		        </div>
+
+		        <!-- THEME SETTINGS 
+
+		        <div class="settings-box">
+
+		            <h5>
+		                Theme Settings
+		            </h5>
+
+		            <select class="form-select mt-3">
+
+		                <option selected>
+		                    Dark Mode
+		                </option>
+
+		                <option>
+		                    Light Mode
+		                </option>
+
+		                <option>
+		                    Purple Neon
+		                </option>
+
+		            </select>
+
+		        </div>
+
+		        <!-- PRIVACY 
+
+		        <div class="settings-box">
+
+		            <h5>
+		                Privacy Controls
+		            </h5>
+
+		            <div class="form-check mt-3">
+
+		                <input class="form-check-input"
+		                       type="checkbox"
+		                       checked>
+
+		                <label class="form-check-label">
+		                    Make Profile Public
+		                </label>
+
+		            </div>
+
+		            <div class="form-check mt-2">
+
+		                <input class="form-check-input"
+		                       type="checkbox">
+
+		                <label class="form-check-label">
+		                    Show Listening Activity
+		                </label>
+
+		            </div>
+
+		        </div>
+
+		        <!-- SAVE BUTTON --
+		        <div class="text-center mt-4">
+
+		            <button class="btn btn-aura px-5">
+
+		                <i class="fa-solid fa-floppy-disk"></i>
+
+		                Save Settings
+
+		            </button>
+
+		        </div>
+
+		    </div>
+
+		</div>
 
         <h4 class="section-title mt-5">
             Account Settings
         </h4>
 
         <!-- NOTIFICATIONS -->
-
+*/--><!--/*
         <div class="settings-box">
 
             <h5>
@@ -390,7 +642,7 @@
                 <label class="form-check-label">
                     Email Notifications
                 </label>
-
+*/--><!--/*
             </div>
 
             <div class="form-check mt-2">
@@ -406,15 +658,15 @@
             </div>
 
         </div>
-
         <!-- THEME SETTINGS -->
+*/--> <!--/*
 
         <div class="settings-box">
 
             <h5>
                 Theme Settings
             </h5>
-
+*/--><!--/*
             <select class="form-select mt-3">
 
                 <option selected>
@@ -430,12 +682,12 @@
                 </option>
 
             </select>
-
+*/--><!--/*
         </div>
 
         <!-- PRIVACY -->
 
-        <div class="settings-box">
+  	*/--><!--/*      <div class="settings-box">
 
             <h5>
                 Privacy Controls
@@ -446,7 +698,7 @@
                 <input class="form-check-input"
                        type="checkbox"
                        checked>
-
+*/--><!--/*
                 <label class="form-check-label">
                     Make Profile Public
                 </label>
@@ -467,7 +719,7 @@
         </div>
 
         <!-- SAVE BUTTON -->
-
+*/--><!--/*
         <div class="text-center mt-4">
 
             <button class="btn btn-aura px-5">
@@ -483,6 +735,57 @@
     </div>
 
 </div>
+	*/-->
+
+	<!-- NOW PLAYING MINI DISK -->
+
+	<a href="/usr/nowPlaying" class="now-playing-disk">
+
+	    <img id="miniPlayerImage"
+	         src="https://picsum.photos/200"
+	         alt="Now Playing">
+
+	</a>
+	<script src="/player.js"></script>
+	<script>
+		audioPlayer.addEventListener("timeupdate", () => {
+
+		    let savedSong = localStorage.getItem("currentSong");
+
+		    if(savedSong){
+
+		        let song = JSON.parse(savedSong);
+
+		        song.time = audioPlayer.currentTime;
+
+		        song.isPlaying = !audioPlayer.paused;
+
+		        localStorage.setItem("currentSong", JSON.stringify(song));
+		    }
+		});
+
+
+	    // Get current playing song image from localStorage
+
+	    const currentImage =
+	        localStorage.getItem("currentSongImage");
+
+	    if(currentImage){
+
+	        document
+	            .getElementById("miniPlayerImage")
+	            .src = currentImage;
+	    }
+
+	</script>
+	<!-- FIXED LOGOUT BUTTON -->
+
+	<a href="/usr/logout"
+	   class="logout-btn-fixed">
+
+	    <i class="fa-solid fa-right-from-bracket"></i>
+
+	</a>
 
 <!-- Bootstrap JS -->
 

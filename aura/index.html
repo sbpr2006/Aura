@@ -543,167 +543,99 @@
     </div>
 </div>
 
-<script src="/player.js"></script>
+<!-- AUDIO PLAYER -->
+<audio id="audioPlayer"></audio>
 
 <!-- PLAYER SCRIPT -->
 <script>
-
-    // PLAYER ELEMENTS
+    // Elements
+    const audioPlayer  = document.getElementById("audioPlayer");
     const playPauseBtn = document.getElementById("playPauseBtn");
-
-    // GLOBAL PLAYER
-    window.globalAudioPlayer = new Audio();
 
     let currentSongIndex = 0;
     let songs = [];
 
-    // PAGE LOAD
+    // Load song buttons on page load
     window.onload = function () {
-
         songs = document.querySelectorAll(".play-btn");
-
-        // RESTORE SONG
-        const savedSong   = localStorage.getItem("currentSong");
-        const savedTitle  = localStorage.getItem("currentTitle");
-        const savedArtist = localStorage.getItem("currentArtist");
-        const savedImage  = localStorage.getItem("currentImage");
-        const savedTime   = localStorage.getItem("currentTime");
-        const isPlaying   = localStorage.getItem("isPlaying");
-
-        if(savedSong){
-
-            globalAudioPlayer.src = savedSong;
-
-            document.getElementById("playerTitle").innerText  = savedTitle;
-            document.getElementById("playerArtist").innerText = savedArtist;
-            document.getElementById("playerImage").src        = savedImage;
-
-            globalAudioPlayer.currentTime = savedTime || 0;
-
-            if(isPlaying === "true"){
-
-                globalAudioPlayer.play();
-
-                playPauseBtn.classList.remove("fa-circle-play");
-                playPauseBtn.classList.add("fa-circle-pause");
-            }
-        }
     };
 
-    // PLAY SONG
-    function playSong(button) {
+    // Play selected song
+	function playSong(button) {
+	    currentSongIndex = Array.from(songs).indexOf(button);
 
-        currentSongIndex = Array.from(songs).indexOf(button);
+	    const title  = button.getAttribute("data-title");
+	    const artist = button.getAttribute("data-artist");
+	    const image  = button.getAttribute("data-image");
+	    const audio  = button.getAttribute("data-audio");
 
-        const title  = button.getAttribute("data-title");
-        const artist = button.getAttribute("data-artist");
-        const image  = button.getAttribute("data-image");
-        const audio  = button.getAttribute("data-audio");
+	    document.getElementById("playerTitle").innerText  = title;
+	    document.getElementById("playerArtist").innerText = artist;
+	    document.getElementById("playerImage").src        = image;
 
-        // UPDATE PLAYER BAR
-        document.getElementById("playerTitle").innerText  = title;
-        document.getElementById("playerArtist").innerText = artist;
-        document.getElementById("playerImage").src        = image;
+	   
+	    let cleanPath = audio.trim().replace(/^\/+/, "");
+	    audioPlayer.src = "/" + cleanPath;
+	    audioPlayer.load();  
+	    audioPlayer.play().catch(e => console.error("Playback error:", e));
+		// SAVE CURRENT TIME
+		audioPlayer.addEventListener("timeupdate", () => {
+		    localStorage.setItem("currentTime", audioPlayer.currentTime);
+		});
+		// SAVE CURRENT SONG
+		localStorage.setItem("currentSong", audioPlayer.src);
+		localStorage.setItem("currentTitle", title);
+		localStorage.setItem("currentArtist", artist);
+		localStorage.setItem("currentImage", image);
+		localStorage.setItem("currentTime", 0);
 
-        // CLEAN PATH
-        let cleanPath = audio.trim().replace(/^\/+/, "");
+	    console.log("Audio path:", audioPlayer.src);
 
-        // PLAY SONG
-        globalAudioPlayer.src = "/" + cleanPath;
+	    playPauseBtn.classList.remove("fa-circle-play");
+	    playPauseBtn.classList.add("fa-circle-pause");
+	}
 
-        globalAudioPlayer.load();
-
-        globalAudioPlayer.play()
-            .then(() => {
-
-                // SAVE SONG DATA
-                localStorage.setItem("currentSong", globalAudioPlayer.src);
-                localStorage.setItem("currentTitle", title);
-                localStorage.setItem("currentArtist", artist);
-                localStorage.setItem("currentImage", image);
-                localStorage.setItem("currentTime", 0);
-                localStorage.setItem("isPlaying", "true");
-
-            })
-            .catch(error => {
-                console.error("Playback error:", error);
-            });
-
-        // UPDATE ICON
-        playPauseBtn.classList.remove("fa-circle-play");
-        playPauseBtn.classList.add("fa-circle-pause");
-    }
-
-    // PLAY / PAUSE
+    // Toggle play/pause
     function togglePlay() {
+        if (audioPlayer.src === "") return;
 
-        if(globalAudioPlayer.src === "") return;
-
-        if(globalAudioPlayer.paused){
-
-            globalAudioPlayer.play();
-
+        if (audioPlayer.paused) {
+            audioPlayer.play();
             playPauseBtn.classList.remove("fa-circle-play");
             playPauseBtn.classList.add("fa-circle-pause");
-
-            localStorage.setItem("isPlaying", "true");
-
         } else {
-
-            globalAudioPlayer.pause();
-
+            audioPlayer.pause();
             playPauseBtn.classList.remove("fa-circle-pause");
             playPauseBtn.classList.add("fa-circle-play");
-
-            localStorage.setItem("isPlaying", "false");
         }
     }
 
-    // NEXT SONG
+    // Play next song
     function nextSong() {
-
-        if(songs.length === 0) return;
+        if (songs.length === 0) return;
 
         currentSongIndex++;
-
-        if(currentSongIndex >= songs.length){
-
+        if (currentSongIndex >= songs.length) {
             currentSongIndex = 0;
         }
 
         playSong(songs[currentSongIndex]);
     }
 
-    // PREVIOUS SONG
+    // Play previous song
     function prevSong() {
-
-        if(songs.length === 0) return;
+        if (songs.length === 0) return;
 
         currentSongIndex--;
-
-        if(currentSongIndex < 0){
-
+        if (currentSongIndex < 0) {
             currentSongIndex = songs.length - 1;
         }
 
         playSong(songs[currentSongIndex]);
     }
 
-    // AUTO NEXT SONG
-    globalAudioPlayer.addEventListener("ended", nextSong);
-
-    // SAVE CURRENT TIME
-    globalAudioPlayer.addEventListener("timeupdate", () => {
-
-        localStorage.setItem(
-            "currentTime",
-            globalAudioPlayer.currentTime
-        );
-    });
-
-</script>
-
-
+    // Auto play next song when current ends
+    audioPlayer.addEventListener("ended", nextSong);
 	// RESTORE SONG AFTER PAGE RELOAD
 	window.addEventListener("load", () => {
 
@@ -731,7 +663,23 @@
 	    }
 	});
 	
+	/* UPDATE TIME CONTINUOUSLY */
 
+	audioPlayer.addEventListener("timeupdate", () => {
+
+	    let savedSong = localStorage.getItem("currentSong");
+
+	    if(savedSong){
+
+	        let song = JSON.parse(savedSong);
+
+	        song.time = audioPlayer.currentTime;
+
+	        song.isPlaying = !audioPlayer.paused;
+
+	        localStorage.setItem("currentSong", JSON.stringify(song));
+	    }
+	});
 	
 </script>
 <!-- BOTTOM NAVIGATION -->

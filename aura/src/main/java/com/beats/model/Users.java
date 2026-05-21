@@ -31,5 +31,11 @@ public class Users {
 
     @Column(nullable = false, length = 255)
     private String password;
+    
+    @Column(length =255)
+    private String name;
+    
+    @Column(length = 255)
+    private String bio = "No Bio";
 
 }

@@ -16,4 +16,8 @@ public class UserService {
 		return user;
 	}
 
+	public Users saveUser(Users user) {
+		return musicRepo.save(user);
+	}
+
 }

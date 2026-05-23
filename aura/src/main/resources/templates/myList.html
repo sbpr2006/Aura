@@ -359,13 +359,8 @@
 
         </a>
 
-        <button class="btn btn-outline-light">
-
-            <i class="fa-solid fa-arrow-left"></i>
-
-            Back
-
-        </button>
+		<a href="/usr/playlist" class="btn btn-outline-light">Back</a>
+		   
 
     </div>
 
@@ -380,7 +375,7 @@
     <div class="playlist-header animate__animated animate__fadeIn">
 
         <h1 class="playlist-name"
-            th:text="${playlist.name}">
+            th:text="${playlist.playlistName}">
 
             Chill Vibes
 
@@ -389,7 +384,7 @@
         <p class="playlist-info">
 
             Total Songs:
-            <span th:text="${#lists.size(playlist.songs)}">
+            <span th:text="${playlistSongs != null ? #lists.size(playlistSongs) : 0}">
                 15
             </span>
 
@@ -397,67 +392,86 @@
 
     </div>
 
-    <!-- SONG LIST -->
+	<!-- SONG LIST -->
 
-    <div th:each="song : ${playlist.songs}"
+	<div th:if="${#lists.isEmpty(playlistSongs)}"
+	     class="text-center text-secondary mt-5">
 
-         th:class="${song.playing} ?
-         'song-card playing animate__animated animate__fadeInUp'
-         :
-         'song-card animate__animated animate__fadeInUp'">
+	    No Songs In Playlist
 
-        <!-- SONG INFO -->
+	</div>
 
-        <div class="song-info">
+	<div th:each="ps : ${playlistSongs}"
 
-            <img th:src="${song.imageUrl}"
-                 src="https://picsum.photos/200">
+	     class="song-card animate__animated animate__fadeInUp">
 
-            <div>
+	    <!-- SONG INFO -->
 
-                <div class="song-title">
+	    <div class="song-info">
 
-                    <span th:text="${song.title}">
-                        Perfect
-                    </span>
+	        <img th:src="@{${ps.song.imagePath}}"
+	             src="https://picsum.photos/200">
 
-                    <!-- CURRENTLY PLAYING ICON -->
+	        <div>
 
-                    <i th:if="${song.playing}"
-                       class="fa-solid fa-wave-square playing-animation"></i>
+	            <div class="song-title">
 
-                </div>
+	                <span th:text="${ps.song.title}">
+	                    Perfect
+	                </span>
 
-                <div class="artist"
-                     th:text="${song.artist}">
+	            </div>
 
-                    Ed Sheeran
+	            <div class="artist"
+	                 th:text="${ps.song.artist}">
 
-                </div>
+	                Ed Sheeran
 
-            </div>
+	            </div>
 
-        </div>
+	        </div>
 
-        <!-- SONG ACTIONS -->
+	    </div>
 
-        <div class="song-actions">
+	    <!-- SONG ACTIONS -->
 
-            <!-- PLAY SONG -->
+	    <div class="song-actions">
 
-            <i class="fa-solid fa-circle-play play-btn"
-               title="Play Song"></i>
+	        <!-- PLAY SONG -->
 
-            <!-- REMOVE SONG -->
+	        <button class="btn btn-sm text-light play-btn"
 
-            <i class="fa-solid fa-trash delete-btn"
-               title="Remove Song"></i>
+	                th:attr="
+	                data-title=${ps.song.title},
+	                data-artist=${ps.song.artist},
+	                data-image=${ps.song.imagePath},
+	                data-audio=${ps.song.filePath}"
 
-        </div>
+	                onclick="playSong(this)">
 
-    </div>
+	            <i class="fa-solid fa-circle-play"></i>
 
-</div>
+	        </button>
+
+	        <!-- REMOVE SONG -->
+
+	        <form th:action="@{/playlist/removeSong}"
+	              method="post">
+
+	            <input type="hidden"
+	                   name="playlistSongId"
+	                   th:value="${ps.playlistSongId}">
+
+	            <button type="submit"
+	                    class="btn btn-sm text-danger">
+
+	                <i class="fa-solid fa-trash"></i>
+
+	            </button>
+
+	        </form>
+
+	    </div>
 
 <!-- PLAYER BAR -->
 

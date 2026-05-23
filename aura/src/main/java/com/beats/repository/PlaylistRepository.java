@@ -11,4 +11,12 @@ import com.beats.model.Playlists;
 public interface PlaylistRepository extends JpaRepository<Playlists, Long> {
 	List<Playlists>     findTop10ByOrderByPlayedCountDesc();
 
+	List<Playlists> findByUserUserId(Long userId);
+
+	Playlists findByUser_UserIdAndPlaylistName(Long userId, String string);
+
+	Playlists findByPlaylistId(Long playlistId);
+
+	List<Playlists> findByUser_UserId(Long userId);
+	
 }

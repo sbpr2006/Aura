@@ -1,6 +1,8 @@
 package com.beats.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.beats.model.PlaylistSongs;
 import com.beats.model.Playlists;
 import com.beats.model.Songs;
 import com.beats.model.Users;
@@ -90,7 +93,6 @@ public class MusicController {
     public String homePage(Model model, HttpSession session) {
     	List<Songs> songs =songServices.getTrendingSongs();
     	List<Playlists> playlists=playlistService.getTrendingPlaylists();
-    	System.out.println(playlists);
         model.addAttribute("songs",songs );
         model.addAttribute("playlists", playlists);
         //model.addAttribute("artists", songServices.getPopularArtists());
@@ -147,64 +149,92 @@ public class MusicController {
     
     @PostMapping("/changePassword")
     public String changePassword(
-
             @RequestParam String currentPassword,
             @RequestParam String newPassword,
             @RequestParam String confirmPassword,
-
-            HttpSession session,
-            Model model) {
-
-        Users user =
-            (Users) session.getAttribute("loggedUser");
-
-        if(user == null) {
-            return "redirect:/usr/loginPage";
-        }
+            HttpSession session,Model model) {
+        Users user =(Users) session.getAttribute("loggedUser");
+        if(user == null) return "redirect:/usr/loginPage";
 
         // WRONG CURRENT PASSWORD
-
         if(!user.getPassword().equals(currentPassword)) {
-
             model.addAttribute("user", user);
-
-            model.addAttribute("error",
-                    "Current Password Incorrect");
-
+            model.addAttribute("error","Current Password Incorrect");
             return "settings";
         }
 
         // PASSWORDS NOT MATCHING
-
         if(!newPassword.equals(confirmPassword)) {
-
             model.addAttribute("user", user);
-
-            model.addAttribute("error",
-                    "Passwords Do Not Match");
-
+            model.addAttribute("error","Passwords Do Not Match");
             return "settings";
         }
 
         // UPDATE PASSWORD ONLY HERE
-
         user.setPassword(newPassword);
-
         userService.saveUser(user);
-
         // UPDATE SESSION
-
         session.setAttribute("loggedUser", user);
-
         model.addAttribute("user", user);
-
-        model.addAttribute("success",
-                "Password Updated Successfully");
-
+        model.addAttribute("success","Password Updated Successfully");
         return "settings";
     }
-    @GetMapping("/playlist")
-    public String playlist() { return "playlists.html"; }
+  
+    @GetMapping("/playlist") String playlistPage(Model model, HttpSession session) {
+            Users user = (Users) session.getAttribute("loggedUser");
+            if (user == null) return "redirect:/usr/loginPage";
+
+            List<Playlists> playlists = playlistService.getPlaylistsByUser(user.getUserId());
+            List<Songs> favouriteSongs = songServices.getFavouriteSongs(user.getUserId());
+
+            Map<Long,Integer> playlistSongCounts =new HashMap<>();
+            for(Playlists playlist : playlists){
+                int count =playlistService.getPlaylistSongCount(playlist.getPlaylistId());
+                playlistSongCounts.put(playlist.getPlaylistId(),count);
+            }
+            model.addAttribute("playlists", playlists);
+            model.addAttribute("favouriteSongs", favouriteSongs);
+            model.addAttribute("playlistSongCounts", playlistSongCounts);
+            return "playlists";
+        }
+
+    @GetMapping("/myplaylist/favourites")
+    public String openFavouritePlaylist(
+            HttpSession session,
+            Model model) {
+        Users user = (Users) session.getAttribute("loggedUser");
+        if(user == null)return "redirect:/usr/loginPage";
+
+
+        // FIND FAVOURITE PLAYLIST
+        Playlists favouritePlaylist =
+                playlistService.findByUserIdAndPlaylistName(user.getUserId(),"FavouriteList");
+
+        // CREATE IF NOT EXISTS
+
+        if(favouritePlaylist == null) {
+
+            favouritePlaylist = new Playlists();
+
+            favouritePlaylist.setPlaylistName("FavouriteList");
+
+            favouritePlaylist.setUser(user);
+
+            playlistService.savePlaylist(favouritePlaylist);
+        }
+
+        // GET SONGS
+
+        List<Songs> songs =songServices.getFavouriteSongs(user.getUserId());
+
+
+        model.addAttribute("playlist", favouritePlaylist);
+
+        model.addAttribute("playlistSongs", songs);
+
+        return "myList";
+    }
+
     @GetMapping("/search")
     public String search() { return "search.html"; }
 }

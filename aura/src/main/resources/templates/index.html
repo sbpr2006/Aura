@@ -347,222 +347,116 @@
 <body>
 
 <!-- NAVBAR -->
-
 <nav class="navbar navbar-expand-lg navbar-dark px-4 sticky-top">
-
     <div class="container-fluid">
-
-        <a class="navbar-brand" href="#">
-            AURA
-        </a>
-
-		<div class="profile-btn"
-		     th:text="${#strings.substring(session.username,0,1).toUpperCase()}"
-		     onclick="window.location.href='/usr/profile'">
-		</div>
-
+        <a class="navbar-brand" href="#">AURA</a>
+        <div class="profile-btn"
+             th:text="${#strings.substring(session.username,0,1).toUpperCase()}"
+             onclick="window.location.href='/usr/profile'">
+        </div>
     </div>
-
 </nav>
 
 <!-- HERO SECTION -->
-
 <div class="container hero-section">
-
     <h1 class="hero-title">
-
-        Feel The Music With
-        <span>AURA</span>
-
+        Feel The Music With <span>AURA</span>
     </h1>
-
     <p class="hero-text">
-
         Stream trending songs, discover artists,
         and immerse yourself in an unlimited musical experience.
-
     </p>
-
 </div>
-
-
 
 <!-- TRENDING SONGS -->
-
 <div class="container mt-4">
-
-    <h2 class="section-title">
-        Top Trending Songs
-    </h2>
-
+    <h2 class="section-title">Top Trending Songs</h2>
     <div class="row g-4">
-
-        <!-- DYNAMIC SONGS -->
-
         <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6"
              th:each="song : ${songs}">
-
             <div class="card music-card h-100 position-relative">
-
-                <!-- SONG IMAGE -->
-
-				<img th:src="@{${song.imagePath}}"
-				     class="card-img-top"
-				     alt="Song Image">
-                <!-- SONG DETAILS -->
-
+                <img th:src="@{${song.imagePath}}"
+                     class="card-img-top"
+                     alt="Song Image">
                 <div class="card-body">
-
-                    <h6 class="fw-bold"
-                        th:text="${song.title}">
-
-                        Song Title
-
-                    </h6>
-
-                    <p class="text-secondary small mb-0"
-                       th:text="${song.artist}">
-
-                        Artist Name
-
-                    </p>
-
+                    <h6 class="fw-bold" th:text="${song.title}">Song Title</h6>
+                    <p class="text-secondary small mb-0" th:text="${song.artist}">Artist Name</p>
                 </div>
-
-                <!-- PLAY BUTTON -->
-				<button class="play-btn"
-
-				        th:attr="
-				        data-title=${song.title},
-				        data-artist=${song.artist},
-				        data-image=${song.imagePath},
-				        data-audio=${song.filePath}"
-
-				        onclick="playSong(this)">
-
-				    <i class="fa-solid fa-play"></i>
-
-				</button>
-
+                <button class="play-btn"
+                        th:attr="data-title=${song.title},
+                                 data-artist=${song.artist},
+                                 data-image=${song.imagePath},
+                                 data-audio=${song.filePath},
+                                 data-songid=${song.songId}"
+                        onclick="playSong(this)">
+                    <i class="fa-solid fa-play"></i>
+                </button>
             </div>
-
         </div>
-
     </div>
-
 </div>
 
-<!-- PLAYLISTS -->
 <!-- TRENDING PLAYLISTS -->
-
 <div class="container mt-5">
-    <h2 class="section-title mb-4">
-        Trending Playlists
-    </h2>
+    <h2 class="section-title mb-4">Trending Playlists</h2>
     <div class="row g-4">
-        <!-- PLAYLIST CARD -->
         <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6"
              th:each="playlist : ${playlists}">
             <div class="card music-card h-100 position-relative">
-                <!-- PLAYLIST IMAGE -->
                 <img src="https://picsum.photos/400?2"
                      class="card-img-top"
                      alt="Playlist Image">
-					 
-                <!-- PLAYLIST DETAILS -->
-				
                 <div class="card-body">
-
-                    <h6 class="fw-bold"
-                        th:text="${playlist.playlistName}">
-
-                        Playlist Name
-
-                    </h6>
-
+                    <h6 class="fw-bold" th:text="${playlist.playlistName}">Playlist Name</h6>
                     <p class="text-secondary small mb-0">
-
                         <i class="fa-solid fa-headphones"></i>
-
-                        <span th:text="${playlist.playedCount}">
-                            0
-                        </span>
-
-                        listeners
-
+                        <span th:text="${playlist.playedCount}">0</span> listeners
                     </p>
-
                 </div>
-
-                <!-- PLAY BUTTON -->
-
-				<div class="playlist-btn">
-
-				    <a th:href="@{/usr/playlist/{id}(id=${playlist.playlistId})}">
-
-				        <i class="fa-solid fa-play"></i>
-
-				    </a>
-
-				</div>
-
+                <div class="playlist-btn">
+                    <a th:href="@{/usr/playlist/{id}(id=${playlist.playlistId})}">
+                        <i class="fa-solid fa-play"></i>
+                    </a>
+                </div>
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 <!-- PLAYER BAR -->
-<!-- PLAYER BAR -->
 <div class="player-bar">
-
-    <!-- SONG INFO -->
     <div class="song-info">
         <img id="playerImage" src="https://picsum.photos/200?4">
-
         <div>
             <div class="song-name" id="playerTitle">No Song Playing</div>
             <div class="artist-name" id="playerArtist">Select a Song</div>
         </div>
     </div>
-
-    <!-- CONTROLS -->
     <div class="player-controls">
-        <!-- PREVIOUS -->
         <i class="fa-solid fa-backward-step" onclick="prevSong()"></i>
-
-        <!-- PLAY / PAUSE -->
         <i class="fa-solid fa-circle-play main-play"
            id="playPauseBtn"
            onclick="togglePlay()"></i>
-
-        <!-- NEXT -->
         <i class="fa-solid fa-forward-step" onclick="nextSong()"></i>
     </div>
 </div>
 
 <script src="/player.js"></script>
 
-<!-- PLAYER SCRIPT -->
 <script>
 
-    // PLAYER ELEMENTS
     const playPauseBtn = document.getElementById("playPauseBtn");
 
-    // GLOBAL PLAYER
-    window.globalAudioPlayer = new Audio();
+    window.globalAudioPlayer = window.globalAudioPlayer || new Audio();
 
     let currentSongIndex = 0;
     let songs = [];
 
-    // PAGE LOAD
-    window.onload = function () {
+    // PAGE LOAD — single unified load handler
+    window.addEventListener("load", () => {
 
         songs = document.querySelectorAll(".play-btn");
 
-        // RESTORE SONG
         const savedSong   = localStorage.getItem("currentSong");
         const savedTitle  = localStorage.getItem("currentTitle");
         const savedArtist = localStorage.getItem("currentArtist");
@@ -570,25 +464,20 @@
         const savedTime   = localStorage.getItem("currentTime");
         const isPlaying   = localStorage.getItem("isPlaying");
 
-        if(savedSong){
-
+        if (savedSong) {
             globalAudioPlayer.src = savedSong;
+            document.getElementById("playerTitle").innerText  = savedTitle  || "";
+            document.getElementById("playerArtist").innerText = savedArtist || "";
+            document.getElementById("playerImage").src        = savedImage  || "";
+            globalAudioPlayer.currentTime = parseFloat(savedTime) || 0;
 
-            document.getElementById("playerTitle").innerText  = savedTitle;
-            document.getElementById("playerArtist").innerText = savedArtist;
-            document.getElementById("playerImage").src        = savedImage;
-
-            globalAudioPlayer.currentTime = savedTime || 0;
-
-            if(isPlaying === "true"){
-
-                globalAudioPlayer.play();
-
+            if (isPlaying === "true") {
+                globalAudioPlayer.play().catch(() => {});
                 playPauseBtn.classList.remove("fa-circle-play");
                 playPauseBtn.classList.add("fa-circle-pause");
             }
         }
-    };
+    });
 
     // PLAY SONG
     function playSong(button) {
@@ -599,149 +488,80 @@
         const artist = button.getAttribute("data-artist");
         const image  = button.getAttribute("data-image");
         const audio  = button.getAttribute("data-audio");
+        const songId = button.getAttribute("data-songid");
 
-        // UPDATE PLAYER BAR
         document.getElementById("playerTitle").innerText  = title;
         document.getElementById("playerArtist").innerText = artist;
         document.getElementById("playerImage").src        = image;
 
-        // CLEAN PATH
         let cleanPath = audio.trim().replace(/^\/+/, "");
-
-        // PLAY SONG
         globalAudioPlayer.src = "/" + cleanPath;
-
         globalAudioPlayer.load();
 
         globalAudioPlayer.play()
             .then(() => {
-
-                // SAVE SONG DATA
-                localStorage.setItem("currentSong", globalAudioPlayer.src);
-                localStorage.setItem("currentTitle", title);
+                localStorage.setItem("currentSong",   globalAudioPlayer.src);
+                localStorage.setItem("currentSongId", songId || "");
+                localStorage.setItem("currentTitle",  title);
                 localStorage.setItem("currentArtist", artist);
-                localStorage.setItem("currentImage", image);
-                localStorage.setItem("currentTime", 0);
-                localStorage.setItem("isPlaying", "true");
-
+                localStorage.setItem("currentImage",  image);
+                localStorage.setItem("currentTime",   "0");
+                localStorage.setItem("isPlaying",     "true");
             })
-            .catch(error => {
-                console.error("Playback error:", error);
-            });
+            .catch(error => console.error("Playback error:", error));
 
-        // UPDATE ICON
         playPauseBtn.classList.remove("fa-circle-play");
         playPauseBtn.classList.add("fa-circle-pause");
     }
 
     // PLAY / PAUSE
     function togglePlay() {
+        if (!globalAudioPlayer.src) return;
 
-        if(globalAudioPlayer.src === "") return;
-
-        if(globalAudioPlayer.paused){
-
+        if (globalAudioPlayer.paused) {
             globalAudioPlayer.play();
-
             playPauseBtn.classList.remove("fa-circle-play");
             playPauseBtn.classList.add("fa-circle-pause");
-
             localStorage.setItem("isPlaying", "true");
-
         } else {
-
             globalAudioPlayer.pause();
-
             playPauseBtn.classList.remove("fa-circle-pause");
             playPauseBtn.classList.add("fa-circle-play");
-
             localStorage.setItem("isPlaying", "false");
         }
     }
 
     // NEXT SONG
     function nextSong() {
-
-        if(songs.length === 0) return;
-
-        currentSongIndex++;
-
-        if(currentSongIndex >= songs.length){
-
-            currentSongIndex = 0;
-        }
-
+        if (songs.length === 0) return;
+        currentSongIndex = (currentSongIndex + 1) % songs.length;
         playSong(songs[currentSongIndex]);
     }
 
     // PREVIOUS SONG
     function prevSong() {
-
-        if(songs.length === 0) return;
-
-        currentSongIndex--;
-
-        if(currentSongIndex < 0){
-
-            currentSongIndex = songs.length - 1;
-        }
-
+        if (songs.length === 0) return;
+        currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
         playSong(songs[currentSongIndex]);
     }
 
-    // AUTO NEXT SONG
+    // AUTO NEXT
     globalAudioPlayer.addEventListener("ended", nextSong);
 
-    // SAVE CURRENT TIME
+    // SAVE TIME
     globalAudioPlayer.addEventListener("timeupdate", () => {
-
-        localStorage.setItem(
-            "currentTime",
-            globalAudioPlayer.currentTime
-        );
+        localStorage.setItem("currentTime", globalAudioPlayer.currentTime);
     });
 
 </script>
 
-
-	// RESTORE SONG AFTER PAGE RELOAD
-	window.addEventListener("load", () => {
-
-	    const savedSong   = localStorage.getItem("currentSong");
-	    const savedTitle  = localStorage.getItem("currentTitle");
-	    const savedArtist = localStorage.getItem("currentArtist");
-	    const savedImage  = localStorage.getItem("currentImage");
-	    const savedTime   = localStorage.getItem("currentTime");
-
-	    if(savedSong){
-
-	        audioPlayer.src = savedSong;
-
-	        document.getElementById("playerTitle").innerText  = savedTitle;
-	        document.getElementById("playerArtist").innerText = savedArtist;
-	        document.getElementById("playerImage").src        = savedImage;
-
-	        audioPlayer.currentTime = savedTime;
-
-	        // OPTIONAL AUTO PLAY
-	        audioPlayer.play();
-
-	        playPauseBtn.classList.remove("fa-circle-play");
-	        playPauseBtn.classList.add("fa-circle-pause");
-	    }
-	});
-	
-
-	
-</script>
 <!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav">
     <a href="/usr/home"><i class="fa-solid fa-house"></i> Home</a>
     <a href="/usr/search"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
-    <a href="/usr/playlist"><i class="fa-solid fa-music"></i> Playlists</a>
+    <a href="/usr/playlists"><i class="fa-solid fa-music"></i> Playlists</a>
     <a href="/usr/profile"><i class="fa-solid fa-user"></i> Profile</a>
 </div>
-<!-- Bootstrap JS -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -1,1680 +1,3 @@
-
-
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AURA - Playlists</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
-    <!-- Animate CSS -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-    <style>
-
-        body{
-
-            background:
-                    linear-gradient(rgba(0,0,0,0.88),
-                    rgba(0,0,0,0.95)),
-                    url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1470&auto=format&fit=crop');
-
-            background-size:cover;
-            background-attachment:fixed;
-
-            font-family:'Segoe UI',sans-serif;
-
-            color:white;
-
-            min-height:100vh;
-        }
-
-        /* NAVBAR */
-
-        .navbar{
-
-            background:rgba(0,0,0,0.75);
-
-            backdrop-filter:blur(10px);
-
-            box-shadow:0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .navbar-brand{
-
-            color:#9d6bff !important;
-
-            font-size:32px;
-
-            font-weight:800;
-
-            letter-spacing:2px;
-        }
-
-        /* SECTION */
-
-        .section-title{
-
-            color:#9d6bff;
-
-            font-weight:bold;
-
-            margin-bottom:25px;
-        }
-
-        /* PLAYLIST CARD */
-
-        .playlist-card{
-
-            background:rgba(20,20,20,0.92);
-
-            border-radius:25px;
-
-            padding:25px;
-
-            margin-bottom:35px;
-
-            box-shadow:0 10px 30px rgba(0,0,0,0.5);
-
-            transition:0.4s;
-        }
-
-        .playlist-card:hover{
-
-            transform:translateY(-6px);
-
-            box-shadow:0 15px 35px rgba(157,107,255,0.25);
-        }
-
-        /* FAVORITES */
-
-        .favorites-card{
-
-            background:
-                    linear-gradient(135deg,
-                    rgba(157,107,255,0.18),
-                    rgba(255,77,109,0.12));
-
-            border:1px solid rgba(157,107,255,0.3);
-        }
-
-        .favorite-icon{
-            color:#ff4d6d;
-        }
-
-        /* SONG ITEM */
-
-        .song-item{
-
-            background:#1f1f1f;
-
-            border-radius:18px;
-
-            padding:15px;
-
-            margin-top:15px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            transition:0.3s;
-        }
-
-        .song-item:hover{
-
-            background:#2a2a2a;
-
-            transform:scale(1.01);
-        }
-
-        .song-info{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:15px;
-        }
-
-        .song-info img{
-
-            width:65px;
-            height:65px;
-
-            border-radius:15px;
-
-            object-fit:cover;
-        }
-
-        .song-title{
-
-            font-size:18px;
-
-            font-weight:bold;
-        }
-
-        .artist{
-
-            color:#b3b3b3;
-
-            font-size:14px;
-        }
-
-        /* ACTION ICONS */
-
-        .song-actions i{
-
-            font-size:18px;
-
-            margin-left:18px;
-
-            cursor:pointer;
-
-            transition:0.3s;
-        }
-
-        .song-actions i:hover{
-
-            color:#9d6bff;
-
-            transform:scale(1.2);
-        }
-
-        /* BUTTONS */
-
-        .btn-aura{
-
-            background:
-                    linear-gradient(to right,
-                    #9d6bff,
-                    #7c3aed);
-
-            border:none;
-
-            color:white;
-
-            border-radius:12px;
-
-            padding:10px 18px;
-
-            font-weight:bold;
-
-            transition:0.3s;
-        }
-
-        .btn-aura:hover{
-
-            transform:scale(1.03);
-
-            box-shadow:0 0 15px rgba(157,107,255,0.5);
-        }
-
-        .btn-delete{
-
-            background:#ff4d4d;
-
-            border:none;
-
-            color:white;
-
-            border-radius:12px;
-
-            padding:10px 18px;
-        }
-
-        .btn-delete:hover{
-
-            background:#ff1f1f;
-        }
-
-        /* INPUT */
-
-        .form-control{
-
-            background:#222;
-
-            border:none;
-
-            color:white;
-
-            border-radius:14px;
-
-            padding:13px;
-        }
-
-        .form-control:focus{
-
-            background:#2d2d2d;
-
-            color:white;
-
-            border:1px solid #9d6bff;
-
-            box-shadow:none;
-        }
-
-        /* CREATE PLAYLIST */
-
-        .create-playlist{
-
-            background:rgba(20,20,20,0.92);
-
-            border-radius:25px;
-
-            padding:30px;
-
-            margin-top:40px;
-
-            margin-bottom:50px;
-
-            box-shadow:0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* RESPONSIVE */
-
-        @media(max-width:768px){
-
-            .song-item{
-
-                flex-direction:column;
-
-                align-items:flex-start;
-
-                gap:15px;
-            }
-
-            .song-actions{
-
-                width:100%;
-
-                display:flex;
-
-                justify-content:flex-end;
-            }
-        }
-
-    </style>
-</head>
-
-<body>
-
-<!-- NAVBAR -->
-
-<nav class="navbar navbar-expand-lg navbar-dark px-4">
-
-    <div class="container-fluid">
-
-        <a class="navbar-brand animate__animated animate__fadeInLeft"
-           href="#">
-
-            AURA
-
-        </a>
-
-        <button class="btn btn-outline-light">
-
-            <i class="fa-solid fa-house"></i>
-
-            Home
-
-        </button>
-
-    </div>
-
-</nav>
-
-<!-- MAIN CONTAINER -->
-
-<div class="container mt-5">
-
-    <!-- FAVORITES SECTION -->
-
-    <div class="playlist-card favorites-card animate__animated animate__fadeInUp">
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-
-            <div>
-
-                <h2 class="section-title">
-
-                    <i class="fa-solid fa-heart favorite-icon"></i>
-
-                    Favourite Songs
-
-                </h2>
-
-                <p class="text-secondary">
-
-                    Your liked songs collection
-
-                </p>
-
-            </div>
-
-        </div>
-
-        <!-- FAVORITE SONGS -->
-
-        <div th:each="song : ${favouriteSongs}">
-
-            <div class="song-item">
-
-                <div class="song-info">
-
-                    <img th:src="${song.imageUrl}"
-                         src="https://picsum.photos/200">
-
-                    <div>
-
-                        <div class="song-title"
-                             th:text="${song.title}">
-                            Perfect
-                        </div>
-
-                        <div class="artist"
-                             th:text="${song.artist}">
-                            Ed Sheeran
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="song-actions">
-
-                    <i class="fa-solid fa-play"></i>
-
-                    <i class="fa-solid fa-heart favorite-icon"></i>
-
-                    <i class="fa-solid fa-trash"></i>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- OTHER PLAYLISTS -->
-
-    <h2 class="section-title mb-4 animate__animated animate__fadeIn">
-
-        Your Playlists
-
-    </h2>
-
-    <div th:each="playlist : ${playlists}"
-         class="playlist-card animate__animated animate__fadeInUp">
-
-        <!-- PLAYLIST HEADER -->
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-
-            <div>
-
-                <h3 class="text-light fw-bold"
-                    th:text="${playlist.name}">
-
-                    Chill Vibes
-
-                </h3>
-
-                <p class="text-secondary">
-
-                    Songs:
-                    <span th:text="${#lists.size(playlist.songs)}">
-                        10
-                    </span>
-
-                </p>
-
-            </div>
-
-            <div class="mt-3 mt-md-0">
-
-                <button class="btn btn-aura me-2">
-
-                    <i class="fa-solid fa-pen"></i>
-
-                    Rename
-
-                </button>
-
-                <button class="btn btn-delete">
-
-                    <i class="fa-solid fa-trash"></i>
-
-                    Delete
-
-                </button>
-
-            </div>
-
-        </div>
-
-        <!-- SONG LIST -->
-
-        <div th:each="song : ${playlist.songs}">
-
-            <div class="song-item">
-
-                <div class="song-info">
-
-                    <img th:src="${song.imageUrl}"
-                         src="https://picsum.photos/200">
-
-                    <div>
-
-                        <div class="song-title"
-                             th:text="${song.title}">
-                            Song Name
-                        </div>
-
-                        <div class="artist"
-                             th:text="${song.artist}">
-                            Artist
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="song-actions">
-
-                    <i class="fa-solid fa-play"></i>
-
-                    <i class="fa-solid fa-heart"></i>
-
-                    <i class="fa-solid fa-trash"></i>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- ADD SONG -->
-
-        <form th:action="@{/playlist/addSong}"
-              method="post"
-              class="mt-4">
-
-            <div class="row">
-
-                <div class="col-md-9 mb-3">
-
-                    <input type="text"
-                           name="songName"
-                           class="form-control"
-                           placeholder="Add song to playlist">
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <button class="btn btn-aura w-100">
-
-                        <i class="fa-solid fa-plus"></i>
-
-                        Add Song
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-    </div>
-
-    <!-- CREATE PLAYLIST -->
-
-    <div class="create-playlist animate__animated animate__fadeInUp">
-
-        <h2 class="section-title">
-
-            Create New Playlist
-
-        </h2>
-
-        <form th:action="@{/playlist/create}"
-              method="post">
-
-            <div class="row">
-
-                <div class="col-md-9 mb-3">
-
-                    <input type="text"
-                           class="form-control"
-                           name="playlistName"
-                           placeholder="Enter playlist name"
-                           required>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <button class="btn btn-aura w-100">
-
-                        <i class="fa-solid fa-music"></i>
-
-                        Create Playlist
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-<!-- Bootstrap JS -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
-
-while clicking onthe list  renders to a page containing list of songs
-myList.htnl:
-list name
-list of songs
-remove song from playlist
-play song
-add highlist the song while its currently playing
-
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AURA - My Playlist</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
-    <!-- Animate CSS -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-    <style>
-
-        body{
-
-            background:
-                    linear-gradient(rgba(0,0,0,0.88),
-                    rgba(0,0,0,0.96)),
-                    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1470&auto=format&fit=crop');
-
-            background-size:cover;
-            background-attachment:fixed;
-
-            color:white;
-
-            font-family:'Segoe UI',sans-serif;
-
-            min-height:100vh;
-
-            padding-bottom:120px;
-        }
-
-        /* NAVBAR */
-
-        .navbar{
-
-            background:rgba(0,0,0,0.75);
-
-            backdrop-filter:blur(10px);
-
-            box-shadow:0 3px 12px rgba(0,0,0,0.4);
-        }
-
-        .navbar-brand{
-
-            color:#9d6bff !important;
-
-            font-size:32px;
-
-            font-weight:800;
-
-            letter-spacing:2px;
-        }
-
-        /* PLAYLIST HEADER */
-
-        .playlist-header{
-
-            background:
-                    linear-gradient(to right,
-                    rgba(157,107,255,0.25),
-                    rgba(124,58,237,0.15));
-
-            border-radius:30px;
-
-            padding:35px;
-
-            margin-top:40px;
-
-            margin-bottom:35px;
-
-            box-shadow:0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .playlist-name{
-
-            font-size:42px;
-
-            font-weight:800;
-
-            color:#ffffff;
-        }
-
-        .playlist-info{
-
-            color:#cfcfcf;
-
-            margin-top:10px;
-        }
-
-        /* SONG LIST */
-
-        .song-card{
-
-            background:rgba(24,24,24,0.95);
-
-            border-radius:22px;
-
-            padding:18px;
-
-            margin-bottom:18px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            transition:0.3s;
-
-            border:1px solid transparent;
-        }
-
-        .song-card:hover{
-
-            transform:translateY(-4px);
-
-            background:#232323;
-
-            border:1px solid rgba(157,107,255,0.3);
-        }
-
-        /* CURRENTLY PLAYING */
-
-        .playing{
-
-            background:
-                    linear-gradient(to right,
-                    rgba(157,107,255,0.22),
-                    rgba(124,58,237,0.18));
-
-            border:1px solid #9d6bff;
-
-            box-shadow:0 0 18px rgba(157,107,255,0.4);
-        }
-
-        .playing .song-title{
-
-            color:#b48cff;
-        }
-
-        .playing-animation{
-
-            color:#9d6bff;
-
-            margin-left:10px;
-
-            animation:pulse 1s infinite;
-        }
-
-        @keyframes pulse{
-
-            0%{
-                opacity:0.4;
-            }
-
-            50%{
-                opacity:1;
-            }
-
-            100%{
-                opacity:0.4;
-            }
-        }
-
-        /* SONG INFO */
-
-        .song-info{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:18px;
-        }
-
-        .song-info img{
-
-            width:75px;
-
-            height:75px;
-
-            border-radius:18px;
-
-            object-fit:cover;
-        }
-
-        .song-title{
-
-            font-size:20px;
-
-            font-weight:bold;
-        }
-
-        .artist{
-
-            color:#b3b3b3;
-
-            margin-top:4px;
-        }
-
-        /* SONG ACTIONS */
-
-        .song-actions i{
-
-            font-size:20px;
-
-            margin-left:22px;
-
-            cursor:pointer;
-
-            transition:0.3s;
-        }
-
-        .song-actions i:hover{
-
-            color:#9d6bff;
-
-            transform:scale(1.2);
-        }
-
-        .play-btn{
-
-            color:#9d6bff;
-        }
-
-        .delete-btn{
-
-            color:#ff4d4d;
-        }
-
-        /* PLAYER BAR */
-
-        .player-bar{
-
-            position:fixed;
-
-            bottom:0;
-
-            left:0;
-
-            width:100%;
-
-            background:#111;
-
-            border-top:1px solid #333;
-
-            padding:15px 25px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            z-index:999;
-        }
-
-        .now-playing{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:15px;
-        }
-
-        .now-playing img{
-
-            width:60px;
-
-            height:60px;
-
-            border-radius:15px;
-        }
-
-        .player-controls i{
-
-            font-size:24px;
-
-            margin:0 18px;
-
-            cursor:pointer;
-
-            transition:0.3s;
-        }
-
-        .player-controls i:hover{
-
-            color:#9d6bff;
-        }
-
-        .main-play{
-
-            font-size:36px !important;
-
-            color:#9d6bff;
-        }
-
-        /* RESPONSIVE */
-
-        @media(max-width:768px){
-
-            .song-card{
-
-                flex-direction:column;
-
-                align-items:flex-start;
-
-                gap:15px;
-            }
-
-            .song-actions{
-
-                width:100%;
-
-                display:flex;
-
-                justify-content:flex-end;
-            }
-
-            .player-bar{
-
-                flex-direction:column;
-
-                gap:15px;
-            }
-
-            .playlist-name{
-
-                font-size:32px;
-            }
-        }
-
-    </style>
-</head>
-
-<body>
-
-<!-- NAVBAR -->
-
-<nav class="navbar navbar-expand-lg navbar-dark px-4">
-
-    <div class="container-fluid">
-
-        <a class="navbar-brand animate__animated animate__fadeInLeft"
-           href="#">
-
-            AURA
-
-        </a>
-
-        <button class="btn btn-outline-light">
-
-            <i class="fa-solid fa-arrow-left"></i>
-
-            Back
-
-        </button>
-
-    </div>
-
-</nav>
-
-<!-- MAIN CONTAINER -->
-
-<div class="container">
-
-    <!-- PLAYLIST HEADER -->
-
-    <div class="playlist-header animate__animated animate__fadeIn">
-
-        <h1 class="playlist-name"
-            th:text="${playlist.name}">
-
-            Chill Vibes
-
-        </h1>
-
-        <p class="playlist-info">
-
-            Total Songs:
-            <span th:text="${#lists.size(playlist.songs)}">
-                15
-            </span>
-
-        </p>
-
-    </div>
-
-    <!-- SONG LIST -->
-
-    <div th:each="song : ${playlist.songs}"
-
-         th:class="${song.playing} ?
-         'song-card playing animate__animated animate__fadeInUp'
-         :
-         'song-card animate__animated animate__fadeInUp'">
-
-        <!-- SONG INFO -->
-
-        <div class="song-info">
-
-            <img th:src="${song.imageUrl}"
-                 src="https://picsum.photos/200">
-
-            <div>
-
-                <div class="song-title">
-
-                    <span th:text="${song.title}">
-                        Perfect
-                    </span>
-
-                    <!-- CURRENTLY PLAYING ICON -->
-
-                    <i th:if="${song.playing}"
-                       class="fa-solid fa-wave-square playing-animation"></i>
-
-                </div>
-
-                <div class="artist"
-                     th:text="${song.artist}">
-
-                    Ed Sheeran
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- SONG ACTIONS -->
-
-        <div class="song-actions">
-
-            <!-- PLAY SONG -->
-
-            <i class="fa-solid fa-circle-play play-btn"
-               title="Play Song"></i>
-
-            <!-- REMOVE SONG -->
-
-            <i class="fa-solid fa-trash delete-btn"
-               title="Remove Song"></i>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- PLAYER BAR -->
-
-<div class="player-bar">
-
-    <!-- NOW PLAYING -->
-
-    <div class="now-playing">
-
-        <img src="https://picsum.photos/200">
-
-        <div>
-
-            <div class="fw-bold">
-                Perfect
-            </div>
-
-            <small class="text-secondary">
-                Ed Sheeran
-            </small>
-
-        </div>
-
-    </div>
-
-    <!-- PLAYER CONTROLS -->
-
-    <div class="player-controls">
-
-        <i class="fa-solid fa-backward-step"></i>
-
-        <i class="fa-solid fa-circle-play main-play"></i>
-
-        <i class="fa-solid fa-forward-step"></i>
-
-    </div>
-
-</div>
-
-<!-- Bootstrap -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
-
-search .html containing :
-search button and recent searches
-
-add player bar and home search  playlist buttons
-
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AURA - Search</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
-    <!-- Animate CSS -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-    <style>
-
-        body{
-
-            background:
-                    linear-gradient(rgba(0,0,0,0.88),
-                    rgba(0,0,0,0.95)),
-                    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1470&auto=format&fit=crop');
-
-            background-size:cover;
-            background-attachment:fixed;
-
-            font-family:'Segoe UI',sans-serif;
-
-            color:white;
-
-            min-height:100vh;
-
-            padding-bottom:140px;
-        }
-
-        /* NAVBAR */
-
-        .navbar{
-
-            background:rgba(0,0,0,0.75);
-
-            backdrop-filter:blur(10px);
-
-            box-shadow:0 2px 10px rgba(0,0,0,0.4);
-        }
-
-        .navbar-brand{
-
-            color:#9d6bff !important;
-
-            font-size:32px;
-
-            font-weight:800;
-
-            letter-spacing:2px;
-        }
-
-        /* SEARCH CONTAINER */
-
-        .search-container{
-
-            margin-top:50px;
-        }
-
-        .search-box{
-
-            background:rgba(18,18,18,0.92);
-
-            border-radius:30px;
-
-            padding:35px;
-
-            box-shadow:0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .search-title{
-
-            color:#9d6bff;
-
-            font-weight:bold;
-
-            margin-bottom:25px;
-        }
-
-        /* SEARCH INPUT */
-
-        .search-input{
-
-            background:#222;
-
-            border:none;
-
-            color:white;
-
-            border-radius:18px;
-
-            padding:16px;
-
-            font-size:18px;
-        }
-
-        .search-input:focus{
-
-            background:#2d2d2d;
-
-            color:white;
-
-            border:1px solid #9d6bff;
-
-            box-shadow:none;
-        }
-
-        .search-btn{
-
-            background:
-                    linear-gradient(to right,
-                    #9d6bff,
-                    #7c3aed);
-
-            border:none;
-
-            border-radius:18px;
-
-            color:white;
-
-            padding:14px 22px;
-
-            font-weight:bold;
-
-            transition:0.3s;
-        }
-
-        .search-btn:hover{
-
-            transform:scale(1.03);
-
-            box-shadow:0 0 15px rgba(157,107,255,0.5);
-        }
-
-        /* RECENT SEARCHES */
-
-        .recent-searches{
-
-            margin-top:40px;
-        }
-
-        .recent-card{
-
-            background:#1f1f1f;
-
-            border-radius:18px;
-
-            padding:18px 20px;
-
-            margin-bottom:18px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            transition:0.3s;
-
-            cursor:pointer;
-        }
-
-        .recent-card:hover{
-
-            background:#2a2a2a;
-
-            transform:translateY(-3px);
-        }
-
-        .recent-info{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:15px;
-        }
-
-        .recent-icon{
-
-            width:50px;
-
-            height:50px;
-
-            border-radius:50%;
-
-            background:
-                    linear-gradient(to right,
-                    #9d6bff,
-                    #7c3aed);
-
-            display:flex;
-
-            justify-content:center;
-
-            align-items:center;
-
-            font-size:20px;
-        }
-
-        .recent-text{
-
-            font-size:18px;
-
-            font-weight:600;
-        }
-
-        .remove-search{
-
-            color:#b3b3b3;
-
-            font-size:18px;
-
-            transition:0.3s;
-        }
-
-        .remove-search:hover{
-
-            color:#ff4d4d;
-
-            transform:scale(1.2);
-        }
-
-        /* PLAYER BAR */
-
-        .player-bar{
-
-            position:fixed;
-
-            bottom:70px;
-
-            left:0;
-
-            width:100%;
-
-            background:#111;
-
-            border-top:1px solid #333;
-
-            padding:15px 25px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            z-index:999;
-        }
-
-        .song-info{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:15px;
-        }
-
-        .song-info img{
-
-            width:60px;
-
-            height:60px;
-
-            border-radius:15px;
-        }
-
-        .player-controls i{
-
-            font-size:24px;
-
-            margin:0 18px;
-
-            cursor:pointer;
-
-            transition:0.3s;
-        }
-
-        .player-controls i:hover{
-
-            color:#9d6bff;
-        }
-
-        .main-play{
-
-            font-size:36px !important;
-
-            color:#9d6bff;
-        }
-
-        /* BOTTOM NAVIGATION */
-
-        .bottom-nav{
-
-            position:fixed;
-
-            bottom:0;
-
-            left:0;
-
-            width:100%;
-
-            background:#000;
-
-            border-top:1px solid #222;
-
-            display:flex;
-
-            justify-content:space-around;
-
-            padding:12px 0;
-
-            z-index:1000;
-        }
-
-        .bottom-nav a{
-
-            text-decoration:none;
-
-            color:#b3b3b3;
-
-            text-align:center;
-
-            transition:0.3s;
-        }
-
-        .bottom-nav a:hover{
-
-            color:#9d6bff;
-        }
-
-        .bottom-nav i{
-
-            display:block;
-
-            font-size:22px;
-
-            margin-bottom:5px;
-        }
-
-        .active-nav{
-
-            color:#9d6bff !important;
-        }
-
-        /* RESPONSIVE */
-
-        @media(max-width:768px){
-
-            .player-bar{
-
-                flex-direction:column;
-
-                gap:15px;
-            }
-
-            .search-box{
-
-                padding:25px;
-            }
-        }
-
-    </style>
-</head>
-
-<body>
-
-<!-- NAVBAR -->
-
-<nav class="navbar navbar-expand-lg navbar-dark px-4">
-
-    <div class="container-fluid">
-
-        <a class="navbar-brand animate__animated animate__fadeInLeft"
-           href="#">
-
-            AURA
-
-        </a>
-
-    </div>
-
-</nav>
-
-<!-- MAIN CONTENT -->
-
-<div class="container search-container">
-
-    <div class="search-box animate__animated animate__fadeIn">
-
-        <!-- SEARCH TITLE -->
-
-        <h2 class="search-title">
-
-            <i class="fa-solid fa-magnifying-glass"></i>
-
-            Search Music
-
-        </h2>
-
-        <!-- SEARCH FORM -->
-
-        <form th:action="@{/search}"
-              method="get">
-
-            <div class="row">
-
-                <div class="col-md-10 mb-3">
-
-                    <input type="text"
-                           name="query"
-                           class="form-control search-input"
-                           placeholder="Search songs, artists, playlists...">
-
-                </div>
-
-                <div class="col-md-2">
-
-                    <button class="btn search-btn w-100">
-
-                        Search
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-        <!-- RECENT SEARCHES -->
-
-        <div class="recent-searches">
-
-            <h4 class="mb-4 text-light">
-
-                Recent Searches
-
-            </h4>
-
-            <!-- RECENT ITEM -->
-
-            <div th:each="recent : ${recentSearches}"
-
-                 class="recent-card animate__animated animate__fadeInUp">
-
-                <div class="recent-info">
-
-                    <div class="recent-icon">
-
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-
-                    </div>
-
-                    <div class="recent-text"
-                         th:text="${recent}">
-
-                        Perfect - Ed Sheeran
-
-                    </div>
-
-                </div>
-
-                <i class="fa-solid fa-xmark remove-search"></i>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- PLAYER BAR -->
-
-<div class="player-bar">
-
-    <div class="song-info">
-
-        <img src="https://picsum.photos/200">
-
-        <div>
-
-            <div class="fw-bold">
-                Blinding Lights
-            </div>
-
-            <small class="text-secondary">
-                The Weeknd
-            </small>
-
-        </div>
-
-    </div>
-
-    <!-- PLAYER CONTROLS -->
-
-    <div class="player-controls">
-
-        <i class="fa-solid fa-backward-step"></i>
-
-        <i class="fa-solid fa-circle-play main-play"></i>
-
-        <i class="fa-solid fa-forward-step"></i>
-
-    </div>
-
-</div>
-
-<!-- BOTTOM NAVIGATION -->
-
-<div class="bottom-nav">
-
-    <a href="/home">
-
-        <i class="fa-solid fa-house"></i>
-
-        Home
-
-    </a>
-
-    <a href="/search"
-       class="active-nav">
-
-        <i class="fa-solid fa-magnifying-glass"></i>
-
-        Search
-
-    </a>
-
-    <a href="/playlists">
-
-        <i class="fa-solid fa-music"></i>
-
-        Playlists
-
-    </a>
-
-</div>
-
-<!-- Bootstrap -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
-
-image.png
-now_playing.html
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -2123,151 +446,357 @@ now_playing.html
     </style>
 </head>
 
+
 <body>
 
 <div class="player-container">
 
     <!-- TOP BAR -->
-
     <div class="top-bar">
-
-        <i class="fa-solid fa-chevron-down"></i>
-
+        <i class="fa-solid fa-chevron-down" onclick="history.back()"></i>
         <div class="album-info">
-
             <p>PLAYING FROM ALBUM</p>
-
-            <h5 th:text="${album.name}">
-                Nocturnal Waves
-            </h5>
-
+            <h5 id="albumName" th:text="${album != null ? album.name : ''}">Nocturnal Waves</h5>
         </div>
-
         <i class="fa-solid fa-ellipsis-vertical"></i>
-
     </div>
 
     <!-- ALBUM COVER -->
-
     <div class="album-cover">
-
-        <img th:src="${song.imageUrl}"
-             src="https://images.unsplash.com/photo-1614149162883-504ce4d13909?q=80&w=800&auto=format&fit=crop">
-
+        <img id="playerImage"
+             th:src="${song != null ? song.imageUrl : ''}"
+             src="https://images.unsplash.com/photo-1614149162883-504ce4d13909?q=80&w=800&auto=format&fit=crop"
+             alt="Album Art">
     </div>
 
     <!-- SONG DETAILS -->
-
     <div class="song-details">
-
-        <div class="song-title"
-             th:text="${song.title}">
-
-            Ethereal Drift
-
-        </div>
-
+        <div class="song-title" id="playerTitle" th:text="${song != null ? song.title : ''}">Ethereal Drift</div>
         <div class="artist-row">
-
-            <div class="artist-name"
-                 th:text="${song.artist}">
-
-                Lumina Specter
-
-            </div>
-
+            <div class="artist-name" id="playerArtist" th:text="${song != null ? song.artist : ''}">Lumina Specter</div>
             <div class="song-badges">
+                <div class="lossless">LOSSLESS</div>
+				<button class="btn btn-sm text-danger"
+				        th:if="${song != null}"
+				        th:attr="data-songid=${song.songId}"
+				        onclick="toggleFavourite(this)">
 
-                <div class="lossless">
+				    <i class="fa-regular fa-heart"></i>
 
-                    LOSSLESS
-
-                </div>
-
-                <i class="fa-regular fa-heart favorite-btn"></i>
-
+				</button>
             </div>
-
         </div>
-
     </div>
 
     <!-- PROGRESS -->
-
     <div class="progress-section">
-
-        <div class="custom-progress">
-
-            <div class="custom-progress-bar"></div>
-
+        <div class="custom-progress" id="progressBar">
+            <div class="custom-progress-bar" id="progressFill"></div>
         </div>
-
         <div class="time-row">
-
-            <span>2:45</span>
-
-            <span>4:12</span>
-
+            <span id="currentTime">0:00</span>
+            <span id="totalTime">0:00</span>
         </div>
-
     </div>
 
     <!-- CONTROLS -->
-
     <div class="controls">
-
-        <i class="fa-solid fa-shuffle shuffle"></i>
-
-        <i class="fa-solid fa-backward-step"></i>
-
-        <div class="play-button">
-
-            <i class="fa-solid fa-pause"></i>
-
+        <i class="fa-solid fa-shuffle" id="shuffleBtn"></i>
+        <i class="fa-solid fa-backward-step" id="prevBtn"></i>
+        <div class="play-button" id="playBtn">
+            <i class="fa-solid fa-play" id="playIcon"></i>
         </div>
-
-        <i class="fa-solid fa-forward-step"></i>
-
-        <i class="fa-solid fa-repeat repeat"></i>
-
+        <i class="fa-solid fa-forward-step" id="nextBtn"></i>
+        <i class="fa-solid fa-repeat" id="repeatBtn"></i>
     </div>
 
 </div>
 
-<!-- BOTTOM NAVIGATION -->
-
+<!-- BOTTOM NAV -->
 <div class="bottom-nav">
-
-    <a href="/home"
-       class="active-nav">
-
+    <a href="/usr/home" class="active-nav">
         <i class="fa-solid fa-house"></i>
-
         Home
-
     </a>
-
-    <a href="/search">
-
+    <a href="/usr/search">
         <i class="fa-solid fa-magnifying-glass"></i>
-
         Search
-
     </a>
-
-    <a href="/playlists">
-
+    <a href="/usr/playlists">
         <i class="fa-solid fa-music"></i>
-
         Playlists
-
     </a>
-
 </div>
 
 <!-- Bootstrap -->
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ─── PLAYER STATE ────────────────────────────────────────────────────────
+    const audio      = window.globalAudioPlayer || new Audio();
+    window.globalAudioPlayer = audio;
+
+    let isShuffle    = false;
+    let isRepeat     = false;
+    let isLiked      = false;
+    let isDragging   = false;
+
+    // ─── DOM REFS ─────────────────────────────────────────────────────────────
+    const playBtn      = document.getElementById("playBtn");
+    const playIcon     = document.getElementById("playIcon");
+    const playerTitle  = document.getElementById("playerTitle");
+    const playerArtist = document.getElementById("playerArtist");
+    const playerImage  = document.getElementById("playerImage");
+    const progressBar  = document.getElementById("progressBar");
+    const progressFill = document.getElementById("progressFill");
+    const currentTimeEl= document.getElementById("currentTime");
+    const totalTimeEl  = document.getElementById("totalTime");
+    const favoriteBtn  = document.getElementById("favoriteBtn");
+    const shuffleBtn   = document.getElementById("shuffleBtn");
+    const repeatBtn    = document.getElementById("repeatBtn");
+    const prevBtn      = document.getElementById("prevBtn");
+    const nextBtn      = document.getElementById("nextBtn");
+
+    // ─── HELPERS ─────────────────────────────────────────────────────────────
+    function formatTime(sec) {
+        if (isNaN(sec)) return "0:00";
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60).toString().padStart(2, "0");
+        return `${m}:${s}`;
+    }
+
+    function updatePlayIcon() {
+        if (audio.paused) {
+            playIcon.classList.replace("fa-pause", "fa-play");
+            playerImage.classList.remove("playing");
+        } else {
+            playIcon.classList.replace("fa-play", "fa-pause");
+            playerImage.classList.add("playing");
+        }
+    }
+
+    // ─── RESTORE FROM LOCALSTORAGE ───────────────────────────────────────────
+    window.addEventListener("load", () => {
+        const savedSong   = localStorage.getItem("currentSong");
+        const savedTitle  = localStorage.getItem("currentTitle");
+        const savedArtist = localStorage.getItem("currentArtist");
+        const savedImage  = localStorage.getItem("currentImage");
+        const savedTime   = parseFloat(localStorage.getItem("currentTime")) || 0;
+        const wasPlaying  = localStorage.getItem("isPlaying") === "true";
+
+        // Thymeleaf may have already injected values; only override if blank
+        if (savedSong && !audio.src) {
+            audio.src = savedSong;
+        }
+
+        if (savedTitle  && !playerTitle.textContent.trim())  playerTitle.textContent  = savedTitle;
+        if (savedArtist && !playerArtist.textContent.trim()) playerArtist.textContent = savedArtist;
+        if (savedImage  && playerImage.getAttribute("src") === "") playerImage.src = savedImage;
+
+        audio.addEventListener("loadedmetadata", () => {
+            audio.currentTime = savedTime;
+            totalTimeEl.textContent = formatTime(audio.duration);
+            if (wasPlaying) audio.play().catch(() => {});
+        }, { once: true });
+
+        // If src already loaded (cached)
+        if (audio.readyState >= 1) {
+            audio.currentTime = savedTime;
+            totalTimeEl.textContent = formatTime(audio.duration);
+            if (wasPlaying) audio.play().catch(() => {});
+        }
+
+        updatePlayIcon();
+    });
+
+    // ─── PLAY / PAUSE ────────────────────────────────────────────────────────
+    playBtn.addEventListener("click", () => {
+        if (audio.paused) {
+            audio.play().catch(err => console.warn("Play blocked:", err));
+        } else {
+            audio.pause();
+        }
+    });
+
+    audio.addEventListener("play",  () => {
+        updatePlayIcon();
+        localStorage.setItem("isPlaying", "true");
+    });
+
+    audio.addEventListener("pause", () => {
+        updatePlayIcon();
+        localStorage.setItem("isPlaying", "false");
+    });
+
+    // ─── PROGRESS BAR UPDATE ─────────────────────────────────────────────────
+    audio.addEventListener("timeupdate", () => {
+        if (isDragging) return;
+        localStorage.setItem("currentTime", audio.currentTime);
+
+        const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+        progressFill.style.width = pct + "%";
+        currentTimeEl.textContent = formatTime(audio.currentTime);
+        totalTimeEl.textContent   = formatTime(audio.duration);
+    });
+
+    // ─── SEEK ON CLICK ────────────────────────────────────────────────────────
+    progressBar.addEventListener("click", (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pct  = (e.clientX - rect.left) / rect.width;
+        audio.currentTime = pct * audio.duration;
+    });
+
+    // ─── SEEK ON DRAG ────────────────────────────────────────────────────────
+    progressBar.addEventListener("mousedown", () => { isDragging = true; });
+    document.addEventListener("mouseup",  (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const rect = progressBar.getBoundingClientRect();
+        const pct  = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+        audio.currentTime = pct * audio.duration;
+    });
+    document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        const rect = progressBar.getBoundingClientRect();
+        const pct  = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+        progressFill.style.width = (pct * 100) + "%";
+        currentTimeEl.textContent = formatTime(pct * audio.duration);
+    });
+
+    // Touch support
+    progressBar.addEventListener("touchstart", () => { isDragging = true; }, { passive: true });
+    document.addEventListener("touchend", (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const touch = e.changedTouches[0];
+        const rect  = progressBar.getBoundingClientRect();
+        const pct   = Math.min(Math.max((touch.clientX - rect.left) / rect.width, 0), 1);
+        audio.currentTime = pct * audio.duration;
+    });
+    document.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+        const touch = e.changedTouches[0];
+        const rect  = progressBar.getBoundingClientRect();
+        const pct   = Math.min(Math.max((touch.clientX - rect.left) / rect.width, 0), 1);
+        progressFill.style.width = (pct * 100) + "%";
+        currentTimeEl.textContent = formatTime(pct * audio.duration);
+    }, { passive: true });
+
+    // ─── PREVIOUS / NEXT ─────────────────────────────────────────────────────
+    prevBtn.addEventListener("click", () => {
+        // If more than 3s in, restart current; else go to previous
+        if (audio.currentTime > 3) {
+            audio.currentTime = 0;
+        } else {
+            fetch("/api/songs/previous")
+                .then(r => r.json())
+                .then(loadSong)
+                .catch(() => { audio.currentTime = 0; });
+        }
+    });
+
+    nextBtn.addEventListener("click", () => {
+        fetch(`/api/songs/next${isShuffle ? "?shuffle=true" : ""}`)
+            .then(r => r.json())
+            .then(loadSong)
+            .catch(() => {});
+    });
+
+    // ─── AUTO-NEXT ON END ────────────────────────────────────────────────────
+    audio.addEventListener("ended", () => {
+        if (isRepeat) {
+            audio.currentTime = 0;
+            audio.play();
+        } else {
+            nextBtn.click();
+        }
+    });
+
+    // ─── LOAD SONG (from API response) ───────────────────────────────────────
+    function loadSong(song) {
+        if (!song || !song.audioUrl) return;
+
+        audio.src = song.audioUrl;
+        audio.play().catch(() => {});
+
+        playerTitle.textContent  = song.title  || "";
+        playerArtist.textContent = song.artist || "";
+        playerImage.src          = song.imageUrl || "";
+
+        localStorage.setItem("currentSong",   song.audioUrl);
+        localStorage.setItem("currentTitle",  song.title  || "");
+        localStorage.setItem("currentArtist", song.artist || "");
+        localStorage.setItem("currentImage",  song.imageUrl || "");
+        localStorage.setItem("currentTime",   "0");
+        localStorage.setItem("isPlaying",     "true");
+    }
+
+    // ─── SHUFFLE ─────────────────────────────────────────────────────────────
+    shuffleBtn.addEventListener("click", () => {
+        isShuffle = !isShuffle;
+        shuffleBtn.classList.toggle("active", isShuffle);
+    });
+
+    // ─── REPEAT ──────────────────────────────────────────────────────────────
+    repeatBtn.addEventListener("click", () => {
+        isRepeat = !isRepeat;
+        repeatBtn.classList.toggle("active", isRepeat);
+        audio.loop = isRepeat;
+    });
+
+    // ─── FAVOURITE ───────────────────────────────────────────────────────────
+    favoriteBtn.addEventListener("click", () => {
+        isLiked = !isLiked;
+        favoriteBtn.classList.toggle("fa-solid",  isLiked);
+        favoriteBtn.classList.toggle("fa-regular", !isLiked);
+        favoriteBtn.classList.toggle("liked", isLiked);
+
+        // Optional: POST to backend
+       const songId = /*[[${song != null ? song.songId : 'null'}]]*/ null;
+        if (songId) {
+            fetch(`/api/songs/${songId}/favourite`, { method: "POST" }).catch(() => {});
+        }
+    });
+	
+	function toggleFavourite(button) {
+
+	    const songId =
+	            button.getAttribute("data-songid");
+
+				fetch("/playlist/toggleFavourite/" + songId, {
+				    method: "POST"
+				})
+	    .then(response => response.text())
+
+	    .then(data => {
+
+	        const icon = button.querySelector("i");
+
+	        // SONG ADDED
+	        if(data === "ADDED") {
+
+	            icon.classList.remove("fa-regular");
+
+	            icon.classList.add("fa-solid");
+	        }
+
+	        // SONG REMOVED
+	        else if(data === "REMOVED") {
+
+	            icon.classList.remove("fa-solid");
+
+	            icon.classList.add("fa-regular");
+	        }
+
+	    })
+
+	    .catch(error => {
+
+	        console.error(error);
+
+	    });
+	}
+</script>
 
 </body>
 </html>

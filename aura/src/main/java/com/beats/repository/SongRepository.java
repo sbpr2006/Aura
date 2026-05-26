@@ -11,4 +11,6 @@ public interface SongRepository extends JpaRepository<Songs,Integer>{
 
 	List<Songs> findTop5ByOrderByRepeatedCountDesc();
 
+	Songs findBySongId(Long songId);
+
 }

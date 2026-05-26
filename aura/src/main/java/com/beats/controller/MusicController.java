@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.beats.model.PlaylistSongs;
 import com.beats.model.Playlists;
 import com.beats.model.Songs;
 import com.beats.model.Users;
@@ -180,7 +180,8 @@ public class MusicController {
         return "settings";
     }
   
-    @GetMapping("/playlist") String playlistPage(Model model, HttpSession session) {
+    @GetMapping("/playlists") 
+    public String playlistPage(Model model, HttpSession session) {
             Users user = (Users) session.getAttribute("loggedUser");
             if (user == null) return "redirect:/usr/loginPage";
 
@@ -234,7 +235,55 @@ public class MusicController {
 
         return "myList";
     }
+    
+    @GetMapping("/myplaylist/{playlistId}")
+    public String openFavouritePlaylist(@PathVariable long playlistId,
+            HttpSession session,
+            Model model) {
+        Users user = (Users) session.getAttribute("loggedUser");
+        if(user == null)return "redirect:/usr/loginPage";
 
+
+        // FIND FAVOURITE PLAYLIST
+        Playlists myPlaylist =
+                playlistService.findByUserIdAndPlaylistId(user.getUserId(),playlistId);
+
+        // CREATE IF NOT EXISTS
+
+        if(myPlaylist == null) {
+
+        }
+
+        // GET SONGS
+
+        List<Songs> songs =songServices.getSongsbyPlalistId(playlistId);
+
+
+        model.addAttribute("playlist", myPlaylist);
+
+        model.addAttribute("playlistSongs", songs);
+
+        return "myList";
+    }
+    
+    @GetMapping("/nowPlaying")
+    public String nowPlayingPage(
+            @RequestParam(required = false) Long songId,
+            HttpSession session,
+            Model model) {
+
+        Users user = (Users) session.getAttribute("loggedUser");
+        if (user == null) return "redirect:/usr/loginPage";
+        if (songId == null) return "redirect:/usr/home";
+
+        Songs song = songServices.getSongById(songId);
+        model.addAttribute("song", song);
+        return "now_playing";
+    }
+    
+    
+    
+    
     @GetMapping("/search")
     public String search() { return "search.html"; }
 }

@@ -12,4 +12,6 @@ public interface PlaylistSongsRepository extends JpaRepository<PlaylistSongs, Lo
 
 	List<PlaylistSongs> findByPlaylist_PlaylistId(Long playlistId);
 
+	PlaylistSongs findByPlaylistPlaylistIdAndSongSongId(Long playlistId, Long songId);
+
 }

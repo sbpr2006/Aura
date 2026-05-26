@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.beats.model.PlaylistSongs;
 import com.beats.model.Playlists;
+import com.beats.model.Songs;
 import com.beats.model.Users;
 import com.beats.repository.MusicRepository;
+import com.beats.repository.PlaylistSongsRepository;
 import com.beats.services.PlaylistService;
 import com.beats.services.SongServices;
 import com.beats.services.UserService;
@@ -20,7 +24,9 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/playlist")
 public class PlaylistControlller {
-
+	@Autowired
+	PlaylistSongsRepository playlistSongsRepo;
+	
     @Autowired(required = true)
     SongServices songServices;
 
@@ -146,4 +152,49 @@ public class PlaylistControlller {
 
         return "redirect:/usr/playlist";
     }
+    @PostMapping("/toggleFavourite/{songId}")
+    @ResponseBody
+    public String toggleFavourite(
+            @PathVariable Long songId,
+            HttpSession session) {
+
+        Users user =
+                (Users) session.getAttribute("loggedUser");
+
+        if(user == null) {
+            return "ERROR";
+        }
+
+        Songs song =
+                songServices.getSongById(songId);
+
+        if(song == null) {
+            return "ERROR";
+        }
+
+        Playlists favouritePlaylist =
+                playlistService.getOrCreateFavouriteList(user);
+
+        boolean exists =
+                playlistService.songExistsInPlaylist(
+                        favouritePlaylist.getPlaylistId(),
+                        songId);
+
+        if(exists) {
+
+            playlistService.removeSongFromPlaylist(
+                    favouritePlaylist.getPlaylistId(),
+                    songId);
+
+            return "REMOVED";
+        }
+
+        playlistService.addSongToPlaylist(
+                favouritePlaylist.getPlaylistId(),
+                song);
+
+        return "ADDED";
+    }
+    
+    
 }

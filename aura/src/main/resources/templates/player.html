@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<!-- GLOBAL PLAYER BAR -->
+
+<div class="player-bar" href="/usr/nowPlaying">
+
+    <!-- SONG DETAILS -->
+
+    <div class="now-playing">
+
+        <img id="playerImage"
+             src="https://picsum.photos/200"
+             alt="Now Playing">
+
+        <div>
+
+            <div class="fw-bold"
+                 id="playerTitle">
+
+                No Song Playing
+
+            </div>
+
+            <small class="text-secondary"
+                   id="playerArtist">
+
+                Unknown Artist
+
+            </small>
+
+        </div>
+
+    </div>
+
+    <!-- PLAYER CONTROLS -->
+
+    <div class="player-controls">
+
+        <!-- PREVIOUS -->
+
+        <button class="control-btn"
+                onclick="prevSong()">
+
+            <i class="fa-solid fa-backward-step"></i>
+
+        </button>
+
+        <!-- PLAY / PAUSE -->
+
+        <button class="control-btn"
+                onclick="togglePlay()">
+
+            <i id="playPauseBtn"
+               class="fa-solid fa-circle-play main-play"></i>
+
+        </button>
+
+        <!-- NEXT -->
+
+        <button class="control-btn"
+                onclick="nextSong()">
+
+            <i class="fa-solid fa-forward-step"></i>
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- PLAYER STYLE -->
+
+<style>
+
+.player-bar{
+
+    position:fixed;
+
+    bottom:0;
+    left:0;
+
+    width:100%;
+    height:85px;
+
+    background:#111;
+
+    border-top:1px solid #333;
+
+    display:flex;
+
+    justify-content:space-between;
+    align-items:center;
+
+    padding:0 25px;
+
+    z-index:9999;
+}
+
+.now-playing{
+
+    display:flex;
+    align-items:center;
+
+    gap:15px;
+}
+
+.now-playing img{
+
+    width:60px;
+    height:60px;
+
+    border-radius:10px;
+
+    object-fit:cover;
+}
+
+.player-controls{
+
+    display:flex;
+    align-items:center;
+
+    gap:25px;
+}
+
+.control-btn{
+
+    background:none;
+    border:none;
+
+    color:white;
+
+    font-size:22px;
+
+    transition:0.3s;
+}
+
+.control-btn:hover{
+
+    color:#8b5cf6;
+
+    transform:scale(1.1);
+}
+
+.main-play{
+
+    font-size:38px;
+}
+</style>
+
+<!-- PLAYER SCRIPT -->
+
+<script>
+
+    // GLOBAL AUDIO PLAYER
+
+    if(!window.globalAudioPlayer){
+
+        window.globalAudioPlayer =
+            new Audio();
+    }
+
+    const audioPlayer =
+        window.globalAudioPlayer;
+
+    // RESTORE SONG AFTER PAGE LOAD
+
+    window.addEventListener("load", () => {
+
+        let savedSong =
+            localStorage.getItem("currentSong");
+
+        if(savedSong){
+
+            let song =
+                JSON.parse(savedSong);
+
+            // UPDATE UI
+
+            document
+                .getElementById("playerTitle")
+                .innerText = song.title;
+
+            document
+                .getElementById("playerArtist")
+                .innerText = song.artist;
+
+            document
+                .getElementById("playerImage")
+                .src = song.image;
+
+            document
+                .getElementById("miniPlayerImage")
+                .src = song.image;
+
+            // RESTORE AUDIO
+
+            if(song.audio){
+
+                audioPlayer.src =
+                    song.audio;
+            }
+
+            // RESTORE TIME
+
+            if(song.time){
+
+                audioPlayer.currentTime =
+                    song.time;
+            }
+
+            // RESTORE PLAY STATE
+
+            if(song.isPlaying){
+
+                audioPlayer.play();
+
+                document
+                    .getElementById("playPauseBtn")
+                    .classList.replace(
+                        "fa-circle-play",
+                        "fa-circle-pause"
+                    );
+            }
+        }
+    });
+
+    // TOGGLE PLAY / PAUSE
+
+    function togglePlay(){
+
+        const btn =
+            document.getElementById(
+                "playPauseBtn"
+            );
+
+        if(audioPlayer.paused){
+
+            audioPlayer.play();
+
+            btn.classList.replace(
+                "fa-circle-play",
+                "fa-circle-pause"
+            );
+
+        }else{
+
+            audioPlayer.pause();
+
+            btn.classList.replace(
+                "fa-circle-pause",
+                "fa-circle-play"
+            );
+        }
+    }
+
+    // SAVE CURRENT TIME
+
+    audioPlayer.addEventListener(
+        "timeupdate",
+        () => {
+
+            let savedSong =
+                localStorage.getItem(
+                    "currentSong"
+                );
+
+            if(savedSong){
+
+                let song =
+                    JSON.parse(savedSong);
+
+                song.time =
+                    audioPlayer.currentTime;
+
+                song.isPlaying =
+                    !audioPlayer.paused;
+
+                localStorage.setItem(
+                    "currentSong",
+                    JSON.stringify(song)
+                );
+            }
+        }
+    );
+
+</script>
+
+</body>
+</html>

@@ -739,7 +739,9 @@
 
 	<!-- NOW PLAYING MINI DISK -->
 
-	<a href="/usr/nowPlaying" class="now-playing-disk">
+	<a id="nowPlayingLink"
+	   href="/usr/nowPlaying"
+	   class="now-playing-disk">
 
 	    <img id="miniPlayerImage"
 	         src="https://picsum.photos/200"
@@ -747,37 +749,25 @@
 
 	</a>
 	<script src="/player.js"></script>
+
 	<script>
-		audioPlayer.addEventListener("timeupdate", () => {
 
-		    let savedSong = localStorage.getItem("currentSong");
+		window.addEventListener("load", () => {
 
-		    if(savedSong){
+		    const savedImage = localStorage.getItem("currentImage");
+		    if (savedImage) {
+		        document.getElementById("miniPlayerImage").src = savedImage;
+		    }
 
-		        let song = JSON.parse(savedSong);
-
-		        song.time = audioPlayer.currentTime;
-
-		        song.isPlaying = !audioPlayer.paused;
-
-		        localStorage.setItem("currentSong", JSON.stringify(song));
+		    const songId = localStorage.getItem("currentSongId");
+		    if (songId) {
+		        document.getElementById("nowPlayingLink").href = "/usr/nowPlaying?songId=" + songId;
 		    }
 		});
 
-
-	    // Get current playing song image from localStorage
-
-	    const currentImage =
-	        localStorage.getItem("currentSongImage");
-
-	    if(currentImage){
-
-	        document
-	            .getElementById("miniPlayerImage")
-	            .src = currentImage;
-	    }
-
 	</script>
+	
+	
 	<!-- FIXED LOGOUT BUTTON -->
 
 	<a href="/usr/logout"

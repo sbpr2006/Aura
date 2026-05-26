@@ -22,7 +22,10 @@ public class SongServices {
 	PlaylistSongsRepository playlistSongsRepo;
 	@Autowired
 	PlaylistService playlistService;
-
+	@Autowired
+	SongRepository sonsRepo;
+	
+	
 	public List<Songs> getTrendingSongs() {
 
 	    return songRepo.findTop5ByOrderByRepeatedCountDesc();
@@ -40,12 +43,25 @@ public class SongServices {
 	    if (favouritePlaylist == null)return new ArrayList<>();
 	    // GET PLAYLIST SONGS USING PLAYLIST ID
 	    Long pId=favouritePlaylist.getPlaylistId();
-	    List<PlaylistSongs> playlistSongs =playlistSongsRepo.findByPlaylist_PlaylistId(pId);
+	    return getSongsbyPlalistId(pId);
+	}
+
+	public List<Songs> getSongsbyPlalistId(long playlistId) {
+	    // GET PLAYLIST SONGS USING PLAYLIST ID
+	    List<PlaylistSongs> playlistSongs =playlistSongsRepo.findByPlaylist_PlaylistId(playlistId);
 	    // CONVERT PLAYLISTSONGS -> SONGS
 	    List<Songs> songs = new ArrayList<>();
 	    for (PlaylistSongs ps : playlistSongs) {
 	        songs.add(ps.getSong());
 	    }
 	    return songs;
+	}
+
+	public Songs getSongById(Long songId) {
+
+	    return songRepo
+	            .findBySongId(songId)
+	            .orElse(null);
+	
 	}
 }

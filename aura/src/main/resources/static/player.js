@@ -1,169 +1,274 @@
 // GLOBAL AUDIO OBJECT
-window.globalAudioPlayer = new Audio();
+
+if (!window.globalAudioPlayer) {
+
+    window.globalAudioPlayer = new Audio();
+}
+
+const globalAudioPlayer =
+    window.globalAudioPlayer;
 
 // RESTORE SONG
+
 window.addEventListener("load", () => {
 
-    const savedSong   = localStorage.getItem("currentSong");
-	const savedSongId = localStorage.getItem("currentSongId");
-    const savedTitle  = localStorage.getItem("currentTitle");
-    const savedArtist = localStorage.getItem("currentArtist");
-    const savedImage  = localStorage.getItem("currentImage");
-    const savedTime   = localStorage.getItem("currentTime");
-    const isPlaying   = localStorage.getItem("isPlaying");
+    const savedSong =
+        localStorage.getItem("currentSong");
+
+    const savedSongId =
+        localStorage.getItem("currentSongId");
+
+    const savedTitle =
+        localStorage.getItem("currentTitle");
+
+    const savedArtist =
+        localStorage.getItem("currentArtist");
+
+    const savedImage =
+        localStorage.getItem("currentImage");
+
+    const savedTime =
+        localStorage.getItem("currentTime");
+
+    const isPlaying =
+        localStorage.getItem("isPlaying");
+
+    // RESTORE AUDIO
 
     if(savedSong){
 
-        globalAudioPlayer.src = savedSong;
-        globalAudioPlayer.currentTime = savedTime || 0;
+        globalAudioPlayer.src =
+            savedSong;
 
-		// RESTORE UI
-		       const titleEl  = document.getElementById("playerTitle");
+        globalAudioPlayer.currentTime =
+            parseFloat(savedTime || 0);
+    }
 
-		       const artistEl = document.getElementById("playerArtist");
+    // RESTORE UI
 
-		       const imageEl  = document.getElementById("playerImage");
+    const titleEl =
+        document.getElementById("playerTitle");
 
-		       const miniPlayerImage = document.getElementById("miniPlayerImage");
+    const artistEl =
+        document.getElementById("playerArtist");
 
-		       const nowPlayingLink = document.getElementById("nowPlayingLink");
+    const imageEl =
+        document.getElementById("playerImage");
 
-		       if(titleEl) titleEl.innerText = savedTitle;
-		      
-		       if(artistEl) artistEl.innerText = savedArtist;
-		      
-		       if(imageEl) imageEl.src = savedImage;
+    const miniPlayerImage =
+        document.getElementById("miniPlayerImage");
 
-		       if(miniPlayerImage) miniPlayerImage.src = savedImage;
-			   
-			   if(nowPlayingLink && savedSongId){
-			               nowPlayingLink.href =
-			                       "/usr/nowPlaying?songId=" + savedSongId;
-			           }
-	   // AUTO PLAY
-	           if(isPlaying === "true"){
-	               globalAudioPlayer.play().catch(error => {
-	                       console.log(error);
-	                   });
-	           }
+    const nowPlayingLink =
+        document.getElementById("nowPlayingLink");
+
+    if(titleEl && savedTitle){
+
+        titleEl.innerText =
+            savedTitle;
+    }
+
+    if(artistEl && savedArtist){
+
+        artistEl.innerText =
+            savedArtist;
+    }
+
+    if(imageEl && savedImage){
+
+        imageEl.src =
+            savedImage;
+    }
+
+    if(miniPlayerImage && savedImage){
+
+        miniPlayerImage.src =
+            savedImage;
+    }
+
+    // FIXED NOW PLAYING LINK
+
+    if(nowPlayingLink &&
+       savedSongId &&
+       savedSongId !== "null"){
+
+        nowPlayingLink.href =
+            "/usr/nowPlaying?songId=" +
+            savedSongId;
+    }
+
+    // AUTO PLAY
+
+    if(isPlaying === "true" &&
+       savedSong){
+
+        globalAudioPlayer.play()
+            .catch(error => {
+
+                console.log(error);
+
+            });
     }
 });
 
 // SAVE TIME
-globalAudioPlayer.addEventListener("timeupdate", () => {
-    localStorage.setItem("currentTime", globalAudioPlayer.currentTime);
-});
+
+globalAudioPlayer.addEventListener(
+    "timeupdate",
+    () => {
+
+        localStorage.setItem(
+            "currentTime",
+            globalAudioPlayer.currentTime
+        );
+    }
+);
 
 // SAVE STATE
-globalAudioPlayer.addEventListener("play", () => {
-    localStorage.setItem("isPlaying", "true");
-});
 
-globalAudioPlayer.addEventListener("pause", () => {
-    localStorage.setItem("isPlaying", "false");
-});	
+globalAudioPlayer.addEventListener(
+    "play",
+    () => {
 
+        localStorage.setItem(
+            "isPlaying",
+            "true"
+        );
+    }
+);
+
+globalAudioPlayer.addEventListener(
+    "pause",
+    () => {
+
+        localStorage.setItem(
+            "isPlaying",
+            "false"
+        );
+    }
+);
 
 // PLAY SONG FUNCTION
-	function playSong(button) {
 
-	    const songId =
-	            button.getAttribute("data-songid");
+function playSong(button) {
 
-	    const title =
-	            button.getAttribute("data-title");
+    const songId =
+        button.getAttribute("data-songid");
 
-	    const artist =
-	            button.getAttribute("data-artist");
+    const title =
+        button.getAttribute("data-title");
 
-	    const image =
-	            button.getAttribute("data-image");
+    const artist =
+        button.getAttribute("data-artist");
 
-	    const audio =
-	            button.getAttribute("data-audio");
+    const image =
+        button.getAttribute("data-image");
 
-	    // UPDATE PLAYER UI
-	    const titleEl =
-	            document.getElementById("playerTitle");
+    const audio =
+        button.getAttribute("data-audio");
 
-	    const artistEl =
-	            document.getElementById("playerArtist");
+    // UPDATE PLAYER UI
 
-	    const imageEl =
-	            document.getElementById("playerImage");
+    const titleEl =
+        document.getElementById("playerTitle");
 
-	    const miniPlayerImage =
-	            document.getElementById("miniPlayerImage");
+    const artistEl =
+        document.getElementById("playerArtist");
 
-	    if(titleEl){
-	        titleEl.innerText = title;
-	    }
+    const imageEl =
+        document.getElementById("playerImage");
 
-	    if(artistEl){
-	        artistEl.innerText = artist;
-	    }
+    const miniPlayerImage =
+        document.getElementById("miniPlayerImage");
 
-	    if(imageEl){
-	        imageEl.src = image;
-	    }
+    const nowPlayingLink =
+        document.getElementById("nowPlayingLink");
 
-	    if(miniPlayerImage){
-	        miniPlayerImage.src = image;
-	    }
+    if(titleEl){
 
-	    // CLEAN PATH
-	    let cleanPath =
-	            audio.trim().replace(/^\/+/, "");
+        titleEl.innerText = title;
+    }
 
-	    // PLAY AUDIO
-	    globalAudioPlayer.src =
-	            "/" + cleanPath;
+    if(artistEl){
 
-	    globalAudioPlayer.load();
+        artistEl.innerText = artist;
+    }
 
-	    globalAudioPlayer.play()
-	        .then(() => {
+    if(imageEl){
 
-	            // SAVE SONG DATA
-	            localStorage.setItem(
-	                "currentSongId",
-	                songId
-	            );
+        imageEl.src = image;
+    }
 
-	            localStorage.setItem(
-	                "currentSong",
-	                globalAudioPlayer.src
-	            );
+    if(miniPlayerImage){
 
-	            localStorage.setItem(
-	                "currentTitle",
-	                title
-	            );
+        miniPlayerImage.src = image;
+    }
 
-	            localStorage.setItem(
-	                "currentArtist",
-	                artist
-	            );
+    // CLEAN AUDIO PATH
 
-	            localStorage.setItem(
-	                "currentImage",
-	                image
-	            );
+    let cleanPath =
+        audio.trim().replace(/^\/+/, "");
 
-	            localStorage.setItem(
-	                "currentTime",
-	                0
-	            );
+    // PLAY AUDIO
 
-	            localStorage.setItem(
-	                "isPlaying",
-	                "true"
-	            );
+    globalAudioPlayer.src =
+        "/" + cleanPath;
 
-	        })
-	        .catch(error => {
+    globalAudioPlayer.load();
 
-	            console.error(error);
+    globalAudioPlayer.play()
 
-	        });
-	}
+        .then(() => {
+
+            // SAVE SONG DATA
+
+            localStorage.setItem(
+                "currentSongId",
+                songId
+            );
+
+            localStorage.setItem(
+                "currentSong",
+                globalAudioPlayer.src
+            );
+
+            localStorage.setItem(
+                "currentTitle",
+                title
+            );
+
+            localStorage.setItem(
+                "currentArtist",
+                artist
+            );
+
+            localStorage.setItem(
+                "currentImage",
+                image
+            );
+
+            localStorage.setItem(
+                "currentTime",
+                "0"
+            );
+
+            localStorage.setItem(
+                "isPlaying",
+                "true"
+            );
+
+            // UPDATE NOW PLAYING LINK
+
+            if(nowPlayingLink){
+
+                nowPlayingLink.href =
+                    "/usr/nowPlaying?songId=" +
+                    songId;
+            }
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+        });
+}

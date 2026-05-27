@@ -310,21 +310,21 @@
 
 	    <div class="song-info">
 
-	        <img th:src="@{${ps.song.imagePath}}"
+	        <img th:src="@{${ps.imagePath}}"
 	             src="https://picsum.photos/200">
 
 	        <div>
 
 	            <div class="song-title">
 
-	                <span th:text="${ps.song.title}">
+	                <span th:text="${ps.title}">
 	                    Perfect
 	                </span>
 
 	            </div>
 
 	            <div class="artist"
-	                 th:text="${ps.song.artist}">
+	                 th:text="${ps.artist}">
 
 	                Ed Sheeran
 
@@ -343,10 +343,11 @@
 	        <button class="btn btn-sm text-light play-btn"
 
 	                th:attr="
-	                data-title=${ps.song.title},
-	                data-artist=${ps.song.artist},
-	                data-image=${ps.song.imagePath},
-	                data-audio=${ps.song.filePath}"
+	                data-title=${ps.title},
+	                data-artist=${ps.artist},
+	                data-image=${ps.imagePath},
+	                data-audio=${ps.filePath},
+					data-songid=${ps.songId}"
 
 	                onclick="playSong(this)">
 
@@ -356,21 +357,25 @@
 
 	        <!-- REMOVE SONG -->
 
-	        <form th:action="@{/playlist/removeSong}"
-	              method="post">
+			<form th:action="@{/playlist/removeSong}"
+			      method="post">
 
-	            <input type="hidden"
-	                   name="playlistSongId"
-	                   th:value="${ps.playlistSongId}">
+			    <input type="hidden"
+			           name="songId"
+			           th:value="${ps.songId}">
 
-	            <button type="submit"
-	                    class="btn btn-sm text-danger">
+			    <input type="hidden"
+			           name="playlistId"
+			           th:value="${playlist.playlistId}">
 
-	                <i class="fa-solid fa-trash"></i>
+			    <button type="submit"
+			            class="btn btn-sm text-danger">
 
-	            </button>
+			        <i class="fa-solid fa-trash"></i>
 
-	        </form>
+			    </button>
+
+			</form>
 
 	    </div>
 	</div>

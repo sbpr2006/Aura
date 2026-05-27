@@ -152,49 +152,96 @@ public class PlaylistControlller {
 
         return "redirect:/usr/playlist";
     }
+    
     @PostMapping("/toggleFavourite/{songId}")
     @ResponseBody
     public String toggleFavourite(
             @PathVariable Long songId,
             HttpSession session) {
 
-        Users user =
-                (Users) session.getAttribute("loggedUser");
+        try {
 
-        if(user == null) {
-            return "ERROR";
-        }
+            // GET LOGGED USER
+            Users user =
+                    (Users) session.getAttribute("loggedUser");
 
-        Songs song =
-                songServices.getSongById(songId);
+            if(user == null) {
 
-        if(song == null) {
-            return "ERROR";
-        }
+                return "LOGIN_REQUIRED";
+            }
 
-        Playlists favouritePlaylist =
-                playlistService.getOrCreateFavouriteList(user);
+            // GET SONG
+            Songs song =
+                    songServices.getSongById(songId);
 
-        boolean exists =
-                playlistService.songExistsInPlaylist(
+            if(song == null) {
+
+                return "SONG_NOT_FOUND";
+            }
+
+            // GET FAVOURITES PLAYLIST
+            Playlists favouritePlaylist =
+                    playlistService.getOrCreateFavouriteList(user);
+
+            // CHECK SONG EXISTS
+            boolean exists =
+                    playlistService.songExistsInPlaylist(
+                            favouritePlaylist.getPlaylistId(),
+                            songId);
+
+            // REMOVE SONG
+            if(exists) {
+
+                playlistService.removeSongFromPlaylist(
                         favouritePlaylist.getPlaylistId(),
                         songId);
 
-        if(exists) {
+                return "REMOVED";
+            }
 
-            playlistService.removeSongFromPlaylist(
+            // ADD SONG
+            playlistService.addSongToPlaylist(
                     favouritePlaylist.getPlaylistId(),
-                    songId);
+                    song);
 
-            return "REMOVED";
+            return "ADDED";
         }
 
-        playlistService.addSongToPlaylist(
-                favouritePlaylist.getPlaylistId(),
-                song);
+        catch (Exception e) {
 
-        return "ADDED";
+            e.printStackTrace();
+
+            return "ERROR";
+        }
     }
     
-    
+    @PostMapping("/removeSong")
+    public String removeSongFromPlaylist(
+            @RequestParam Long playlistId,
+            @RequestParam Long songId,
+            HttpSession session) {
+
+        try {
+
+            playlistService.removeSongFromPlaylist(
+                    playlistId,
+                    songId
+            );
+
+            session.setAttribute(
+                    "success",
+                    "Song removed from playlist successfully"
+            );
+
+        }
+        catch (Exception e) {
+
+        	session.setAttribute(
+                    "error",
+                    "Failed to remove song"
+            );
+        }
+
+        return "redirect:/playlist/myList/" + playlistId;
+    }
 }

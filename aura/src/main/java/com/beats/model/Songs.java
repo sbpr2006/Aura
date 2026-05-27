@@ -48,9 +48,6 @@ public class Songs {
     @Column
     private int repeatedCount;
 
-	public Songs orElse(Object object) {
 
-		return null;
-	}
    
 }

@@ -275,9 +275,11 @@ public class MusicController {
         Users user = (Users) session.getAttribute("loggedUser");
         if (user == null) return "redirect:/usr/loginPage";
         if (songId == null) return "redirect:/usr/home";
+        boolean  isFavourite=playlistService.isSongInFavourites(user,songId);
 
         Songs song = songServices.getSongById(songId);
         model.addAttribute("song", song);
+        model.addAttribute("isFavourite", isFavourite);
         return "now_playing";
     }
     

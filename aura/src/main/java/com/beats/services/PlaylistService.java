@@ -132,6 +132,18 @@ public class PlaylistService {
 
 	    return ps != null;
 	}
+	public boolean isSongInFavourites(Users user, Long songId) {
+
+	    // GET FAVOURITES PLAYLIST
+	    Playlists favouritePlaylist =
+	            getOrCreateFavouriteList(user);
+
+	    // CHECK SONG EXISTS
+	    return songExistsInPlaylist(
+	            favouritePlaylist.getPlaylistId(),
+	            songId
+	    );
+	}
 	
 
 }

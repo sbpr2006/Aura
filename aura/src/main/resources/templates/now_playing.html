@@ -456,7 +456,7 @@
         <i class="fa-solid fa-chevron-down" onclick="history.back()"></i>
         <div class="album-info">
             <p>PLAYING FROM ALBUM</p>
-            <h5 id="albumName" th:text="${album != null ? album.name : ''}">Nocturnal Waves</h5>
+            <h5 id="albumName" th:text="${song != null ? song.album : ''}">Nocturnal Waves</h5>
         </div>
         <i class="fa-solid fa-ellipsis-vertical"></i>
     </div>
@@ -464,7 +464,7 @@
     <!-- ALBUM COVER -->
     <div class="album-cover">
         <img id="playerImage"
-             th:src="${song != null ? song.imageUrl : ''}"
+             th:src="${song != null ? song.imagePath : ''}"
              src="https://images.unsplash.com/photo-1614149162883-504ce4d13909?q=80&w=800&auto=format&fit=crop"
              alt="Album Art">
     </div>
@@ -477,11 +477,14 @@
             <div class="song-badges">
                 <div class="lossless">LOSSLESS</div>
 				<button class="btn btn-sm text-danger"
-				        th:if="${song != null}"
+
 				        th:attr="data-songid=${song.songId}"
 				        onclick="toggleFavourite(this)">
 
-				    <i class="fa-regular fa-heart"></i>
+						<i th:class="${isFavourite} ? 
+						'fa-solid fa-heart' : 
+						'fa-regular fa-heart'">
+						</i>
 
 				</button>
             </div>
@@ -714,19 +717,19 @@
 
     // ─── LOAD SONG (from API response) ───────────────────────────────────────
     function loadSong(song) {
-        if (!song || !song.audioUrl) return;
+        if (!song || !song.filePath) return;
 
-        audio.src = song.audioUrl;
+        audio.src = song.filePath;
         audio.play().catch(() => {});
 
         playerTitle.textContent  = song.title  || "";
         playerArtist.textContent = song.artist || "";
-        playerImage.src          = song.imageUrl || "";
+        playerImage.src          = song.imagePath || "";
 
-        localStorage.setItem("currentSong",   song.audioUrl);
+        localStorage.setItem("currentSong",   song.filePath);
         localStorage.setItem("currentTitle",  song.title  || "");
         localStorage.setItem("currentArtist", song.artist || "");
-        localStorage.setItem("currentImage",  song.imageUrl || "");
+        localStorage.setItem("currentImage",  song.imagePath || "");
         localStorage.setItem("currentTime",   "0");
         localStorage.setItem("isPlaying",     "true");
     }
@@ -751,11 +754,7 @@
         favoriteBtn.classList.toggle("fa-regular", !isLiked);
         favoriteBtn.classList.toggle("liked", isLiked);
 
-        // Optional: POST to backend
-       const songId = /*[[${song != null ? song.songId : 'null'}]]*/ null;
-        if (songId) {
-            fetch(`/api/songs/${songId}/favourite`, { method: "POST" }).catch(() => {});
-        }
+      
     });
 	
 	function toggleFavourite(button) {

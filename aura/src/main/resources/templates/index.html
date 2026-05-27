@@ -340,6 +340,58 @@
                 flex-direction:column;
             }
         }
+		
+		
+		.horizontal-slider{
+
+		    display:flex;
+		    gap:20px;
+
+		    overflow-x:auto;
+		    scroll-behavior:smooth;
+
+		    scrollbar-width:none;
+
+		    padding-bottom:10px;
+		}
+
+		.horizontal-slider::-webkit-scrollbar{
+		    display:none;
+		}
+
+		.music-slide-card{
+
+		    min-width:220px;
+		    max-width:220px;
+
+		    flex:0 0 auto;
+		}
+
+		.slider-controls{
+
+		    display:flex;
+		    gap:10px;
+		}
+
+		.slide-btn{
+
+		    width:40px;
+		    height:40px;
+
+		    border:none;
+		    border-radius:50%;
+
+		    background:#1e1e1e;
+		    color:white;
+
+		    transition:0.3s;
+		}
+
+		.slide-btn:hover{
+
+		    background:#8A2BE2;
+		    transform:scale(1.1);
+		}
 
     </style>
 </head>
@@ -370,76 +422,189 @@
 
 <!-- TRENDING SONGS -->
 <div class="container mt-4">
-    <h2 class="section-title">Top Trending Songs</h2>
-    <div class="row g-4">
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6"
-             th:each="song : ${songs}">
-            <div class="card music-card h-100 position-relative">
-                <img th:src="@{${song.imagePath}}"
-                     class="card-img-top"
-                     alt="Song Image">
-                <div class="card-body">
-                    <h6 class="fw-bold" th:text="${song.title}">Song Title</h6>
-                    <p class="text-secondary small mb-0" th:text="${song.artist}">Artist Name</p>
-                </div>
-                <button class="play-btn"
-                        th:attr="data-title=${song.title},
-                                 data-artist=${song.artist},
-                                 data-image=${song.imagePath},
-                                 data-audio=${song.filePath},
-                                 data-songid=${song.songId}"
-                        onclick="playSong(this)">
-                    <i class="fa-solid fa-play"></i>
-                </button>
-            </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h2 class="section-title mb-0">
+            Top Trending Songs
+        </h2>
+
+        <div class="slider-controls">
+
+            <button class="slide-btn"
+                    onclick="slideLeft('songsRow')">
+
+                <i class="fa-solid fa-chevron-left"></i>
+
+            </button>
+
+            <button class="slide-btn"
+                    onclick="slideRight('songsRow')">
+
+                <i class="fa-solid fa-chevron-right"></i>
+
+            </button>
+
         </div>
+
     </div>
+
+    <div class="horizontal-slider" id="songsRow">
+
+        <div class="music-slide-card"
+             th:each="song : ${songs}">
+
+			 <div class="card music-card h-100 position-relative"
+			 	     style="cursor:pointer;"
+			 	     th:attr="
+			 	     data-title=${song.title},
+			 	     data-artist=${song.artist},
+			 	     data-image=${song.imagePath},
+			 	     data-audio=${song.filePath},
+			 	     data-songid=${song.songId}"
+			 	     onclick="playSong(this)">
+
+			 	    <img th:src="@{${song.imagePath}}"
+			 	         class="card-img-top"
+			 	         alt="Song Image">
+
+			 	    <div class="card-body">
+
+			 	        <h6 class="fw-bold"
+			 	            th:text="${song.title}">
+			 	            Song Title
+			 	        </h6>
+
+			 	        <p class="text-secondary small mb-0"
+			 	           th:text="${song.artist}">
+			 	            Artist Name
+			 	        </p>
+
+			 	    </div>
+
+			 	    <div class="play-btn">
+			 	        <i class="fa-solid fa-play"></i>
+			 	    </div>
+
+			 	</div>
+
+
+        </div>
+
+    </div>
+
 </div>
 
 <!-- TRENDING PLAYLISTS -->
 <div class="container mt-5">
-    <h2 class="section-title mb-4">Trending Playlists</h2>
-    <div class="row g-4">
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6"
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h2 class="section-title mb-0">
+            Trending Playlists
+        </h2>
+
+        <div class="slider-controls">
+
+            <button class="slide-btn"
+                    onclick="slideLeft('playlistRow')">
+
+                <i class="fa-solid fa-chevron-left"></i>
+
+            </button>
+
+            <button class="slide-btn"
+                    onclick="slideRight('playlistRow')">
+
+                <i class="fa-solid fa-chevron-right"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="horizontal-slider" id="playlistRow">
+
+        <div class="music-slide-card"
              th:each="playlist : ${playlists}">
+
             <div class="card music-card h-100 position-relative">
+
                 <img src="https://picsum.photos/400?2"
                      class="card-img-top"
                      alt="Playlist Image">
+
                 <div class="card-body">
-                    <h6 class="fw-bold" th:text="${playlist.playlistName}">Playlist Name</h6>
+
+                    <h6 class="fw-bold"
+                        th:text="${playlist.playlistName}">
+                        Playlist Name
+                    </h6>
+
                     <p class="text-secondary small mb-0">
+
                         <i class="fa-solid fa-headphones"></i>
-                        <span th:text="${playlist.playedCount}">0</span> listeners
+
+                        <span th:text="${playlist.playedCount}">
+                            0
+                        </span>
+
+                        listeners
+
                     </p>
+
                 </div>
+
                 <div class="playlist-btn">
+
                     <a th:href="@{/usr/playlist/{id}(id=${playlist.playlistId})}">
-                        <i class="fa-solid fa-play"></i>
+
+						<div class="play-btn">
+
+						            <i class="fa-solid fa-play"></i>
+
+						        </div>
+
                     </a>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+<script>
+
+function slideLeft(id){
+
+    const container =
+        document.getElementById(id);
+
+    container.scrollBy({
+        left:-500,
+        behavior:"smooth"
+    });
+}
+
+function slideRight(id){
+
+    const container =
+        document.getElementById(id);
+
+    container.scrollBy({
+        left:500,
+        behavior:"smooth"
+    });
+}
+
+</script>
 
 <!-- PLAYER BAR -->
-<div class="player-bar">
-    <div class="song-info">
-        <img id="playerImage" src="https://picsum.photos/200?4">
-        <div>
-            <div class="song-name" id="playerTitle">No Song Playing</div>
-            <div class="artist-name" id="playerArtist">Select a Song</div>
-        </div>
-    </div>
-    <div class="player-controls">
-        <i class="fa-solid fa-backward-step" onclick="prevSong()"></i>
-        <i class="fa-solid fa-circle-play main-play"
-           id="playPauseBtn"
-           onclick="togglePlay()"></i>
-        <i class="fa-solid fa-forward-step" onclick="nextSong()"></i>
-    </div>
-</div>
+<div th:replace="player.html"></div>
 
 <script src="/player.js"></script>
 

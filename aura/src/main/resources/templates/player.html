@@ -5,72 +5,68 @@
 <body>
 
 <!-- GLOBAL PLAYER BAR -->
+	<div class="player-bar"
+	     id="playerBar"
+		 onclick="goToNowPlaying()">
+	
+	    <!-- SONG DETAILS -->
+	
+	    <div class="now-playing">
+	
+	        <img id="playerImage"
+	             src="https://picsum.photos/200"
+	             alt="Now Playing">
+	
+	        <div>
+	
+	            <div class="fw-bold"
+	                 id="playerTitle">
+	
+	                No Song Playing
+	
+	            </div>
+	
+	            <small class="text-secondary"
+	                   id="playerArtist">
+	
+	                Unknown Artist
+	
+	            </small>
+	
+	        </div>
+	
+	    </div>
+	
+	    <!-- PLAYER CONTROLS -->
+	
+	    <div class="player-controls">
+	
+	        <button class="control-btn"
+	                onclick="event.stopPropagation(); prevSong()">
+	
+	            <i class="fa-solid fa-backward-step"></i>
+	
+	        </button>
+	
+	        <button class="control-btn"
+	                onclick="event.stopPropagation(); togglePlay()">
+	
+	            <i id="playPauseBtn"
+	               class="fa-solid fa-circle-play main-play"></i>
+	
+	        </button>
+	
+	        <button class="control-btn"
+	                onclick="event.stopPropagation(); nextSong()">
+	
+	            <i class="fa-solid fa-forward-step"></i>
+	
+	        </button>
+	
+	    </div>
+	
+	</div>
 
-<div class="player-bar" href="/usr/nowPlaying">
-
-    <!-- SONG DETAILS -->
-
-    <div class="now-playing">
-
-        <img id="playerImage"
-             src="https://picsum.photos/200"
-             alt="Now Playing">
-
-        <div>
-
-            <div class="fw-bold"
-                 id="playerTitle">
-
-                No Song Playing
-
-            </div>
-
-            <small class="text-secondary"
-                   id="playerArtist">
-
-                Unknown Artist
-
-            </small>
-
-        </div>
-
-    </div>
-
-    <!-- PLAYER CONTROLS -->
-
-    <div class="player-controls">
-
-        <!-- PREVIOUS -->
-
-        <button class="control-btn"
-                onclick="prevSong()">
-
-            <i class="fa-solid fa-backward-step"></i>
-
-        </button>
-
-        <!-- PLAY / PAUSE -->
-
-        <button class="control-btn"
-                onclick="togglePlay()">
-
-            <i id="playPauseBtn"
-               class="fa-solid fa-circle-play main-play"></i>
-
-        </button>
-
-        <!-- NEXT -->
-
-        <button class="control-btn"
-                onclick="nextSong()">
-
-            <i class="fa-solid fa-forward-step"></i>
-
-        </button>
-
-    </div>
-
-</div>
 
 <!-- PLAYER STYLE -->
 
@@ -98,6 +94,12 @@
     padding:0 25px;
 
     z-index:9999;
+	cursor:pointer;
+	transition:0.3s ease;
+}
+.player-bar:hover{
+
+    background:#181818;
 }
 
 .now-playing{
@@ -106,6 +108,7 @@
     align-items:center;
 
     gap:15px;
+    pointer-events:none;
 }
 
 .now-playing img{
@@ -124,9 +127,10 @@
     align-items:center;
 
     gap:25px;
+    pointer-events:none;
 }
-
 .control-btn{
+    pointer-events:all;
 
     background:none;
     border:none;
@@ -166,69 +170,84 @@
     const audioPlayer =
         window.globalAudioPlayer;
 
-    // RESTORE SONG AFTER PAGE LOAD
+    // PAGE LOAD
 
     window.addEventListener("load", () => {
 
-        let savedSong =
+        const savedSong =
             localStorage.getItem("currentSong");
 
-        if(savedSong){
+        const savedTitle =
+            localStorage.getItem("currentTitle");
 
-            let song =
-                JSON.parse(savedSong);
+        const savedArtist =
+            localStorage.getItem("currentArtist");
 
-            // UPDATE UI
+        const savedImage =
+            localStorage.getItem("currentImage");
+
+        const savedTime =
+            localStorage.getItem("currentTime");
+
+        const isPlaying =
+            localStorage.getItem("isPlaying");
+
+        // UPDATE UI
+
+        if(savedTitle){
 
             document
                 .getElementById("playerTitle")
-                .innerText = song.title;
+                .innerText = savedTitle;
+        }
+
+        if(savedArtist){
 
             document
                 .getElementById("playerArtist")
-                .innerText = song.artist;
+                .innerText = savedArtist;
+        }
+
+        if(savedImage){
 
             document
                 .getElementById("playerImage")
-                .src = song.image;
+                .src = savedImage;
+        }
+
+        // LOAD AUDIO
+
+        if(savedSong){
+
+            audioPlayer.src =
+                savedSong;
+        }
+
+        // RESTORE TIME
+
+        if(savedTime){
+
+            audioPlayer.currentTime =
+                parseFloat(savedTime);
+        }
+
+        // RESTORE PLAY STATE
+
+        if(isPlaying === "true"){
+
+            audioPlayer.play()
+                .catch(() => {});
 
             document
-                .getElementById("miniPlayerImage")
-                .src = song.image;
-
-            // RESTORE AUDIO
-
-            if(song.audio){
-
-                audioPlayer.src =
-                    song.audio;
-            }
-
-            // RESTORE TIME
-
-            if(song.time){
-
-                audioPlayer.currentTime =
-                    song.time;
-            }
-
-            // RESTORE PLAY STATE
-
-            if(song.isPlaying){
-
-                audioPlayer.play();
-
-                document
-                    .getElementById("playPauseBtn")
-                    .classList.replace(
-                        "fa-circle-play",
-                        "fa-circle-pause"
-                    );
-            }
+                .getElementById("playPauseBtn")
+                .classList.replace(
+                    "fa-circle-play",
+                    "fa-circle-pause"
+                );
         }
     });
 
-    // TOGGLE PLAY / PAUSE
+    // PLAY / PAUSE
 
     function togglePlay(){
 
@@ -246,6 +265,11 @@
                 "fa-circle-pause"
             );
 
+            localStorage.setItem(
+                "isPlaying",
+                "true"
+            );
+
         }else{
 
             audioPlayer.pause();
@@ -253,6 +277,11 @@
             btn.classList.replace(
                 "fa-circle-pause",
                 "fa-circle-play"
+            );
+
+            localStorage.setItem(
+                "isPlaying",
+                "false"
             );
         }
     }
@@ -263,30 +292,22 @@
         "timeupdate",
         () => {
 
-            let savedSong =
-                localStorage.getItem(
-                    "currentSong"
-                );
-
-            if(savedSong){
-
-                let song =
-                    JSON.parse(savedSong);
-
-                song.time =
-                    audioPlayer.currentTime;
-
-                song.isPlaying =
-                    !audioPlayer.paused;
-
-                localStorage.setItem(
-                    "currentSong",
-                    JSON.stringify(song)
-                );
-            }
+            localStorage.setItem(
+                "currentTime",
+                audioPlayer.currentTime
+            );
         }
     );
 
+	// OPEN NOW PLAYING PAGE
+
+	function goToNowPlaying(){
+	        const songId =
+	            localStorage.getItem("currentSongId");
+
+	        window.location.href =
+	            "/usr/nowPlaying?songId=" + (songId || "");
+	    }
 </script>
 
 </body>

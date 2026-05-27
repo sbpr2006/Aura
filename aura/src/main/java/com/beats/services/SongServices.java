@@ -60,8 +60,7 @@ public class SongServices {
 	public Songs getSongById(Long songId) {
 
 	    return songRepo
-	            .findBySongId(songId)
-	            .orElse(null);
+	            .findBySongId(songId);
 	
 	}
 }

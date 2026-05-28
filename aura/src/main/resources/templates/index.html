@@ -203,30 +203,6 @@
             margin-top:15px;
         }
 
-        /* PLAYER BAR */
-
-        .player-bar{
-
-            position:fixed;
-
-            bottom:70px;
-
-            width:100%;
-
-            background:rgba(10,10,10,0.95);
-
-            backdrop-filter:blur(10px);
-
-            border-top:1px solid #333;
-
-            padding:15px 25px;
-
-            z-index:999;
-
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-        }
 
         .song-info{
             display:flex;
@@ -273,52 +249,7 @@
             color:#8b5cf6;
         }
 
-        /* BOTTOM NAVIGATION */
-
-        .bottom-nav{
-
-            position:fixed;
-
-            bottom:0;
-
-            width:100%;
-
-            background:#000;
-
-            border-top:1px solid #222;
-
-            display:flex;
-            justify-content:space-around;
-
-            padding:12px 0;
-
-            z-index:1000;
-        }
-
-        .bottom-nav a{
-
-            color:#b3b3b3;
-
-            text-decoration:none;
-
-            text-align:center;
-
-            transition:0.3s;
-        }
-
-        .bottom-nav a:hover{
-            color:#8b5cf6;
-        }
-
-        .bottom-nav i{
-
-            display:block;
-
-            font-size:22px;
-
-            margin-bottom:5px;
-        }
-
+		
         /* RESPONSIVE */
 
         @media(max-width:768px){
@@ -603,10 +534,7 @@ function slideRight(id){
 
 </script>
 
-<!-- PLAYER BAR -->
-<div th:replace="player.html"></div>
 
-<script src="/player.js"></script>
 
 <script>
 
@@ -646,7 +574,6 @@ function slideRight(id){
 
     // PLAY SONG
     function playSong(button) {
-
         currentSongIndex = Array.from(songs).indexOf(button);
 
         const title  = button.getAttribute("data-title");
@@ -677,6 +604,10 @@ function slideRight(id){
 
         playPauseBtn.classList.remove("fa-circle-play");
         playPauseBtn.classList.add("fa-circle-pause");
+
+		fetch("/usr/song/incrementRepeat?songId=" + songId, {
+		    method:"POST"
+		});
     }
 
     // PLAY / PAUSE
@@ -719,14 +650,10 @@ function slideRight(id){
     });
 
 </script>
+<!-- PLAYER BAR -->
+<div th:replace="player.html"></div>
 
-<!-- BOTTOM NAVIGATION -->
-<div class="bottom-nav">
-    <a href="/usr/home"><i class="fa-solid fa-house"></i> Home</a>
-    <a href="/usr/search"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
-    <a href="/usr/playlists"><i class="fa-solid fa-music"></i> Playlists</a>
-    <a href="/usr/profile"><i class="fa-solid fa-user"></i> Profile</a>
-</div>
+<script src="/player.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

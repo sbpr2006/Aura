@@ -2,6 +2,7 @@ package com.beats.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.beats.model.PlaylistSongs;
 import com.beats.model.Playlists;
 import com.beats.model.Songs;
 import com.beats.model.Users;
@@ -78,17 +78,20 @@ public class PlaylistControlller {
             );
         }
 
-        return "redirect:/usr/playlist";
+        return "redirect:/usr/playlists";
     }
 
     // DELETE PLAYLIST
 
     @PostMapping("/delete/{playlistId}")
+    @Transactional
     public String deletePlaylist(
             @PathVariable Long playlistId,
             HttpSession session) {
 
         try {
+        	playlistSongsRepo
+        	.deleteByPlaylist_PlaylistId(playlistId);
 
             playlistService.deletePlaylist(playlistId);
 
@@ -105,7 +108,7 @@ public class PlaylistControlller {
             );
         }
 
-        return "redirect:/usr/playlist";
+        return "redirect:/usr/playlists";
     }
 
     // RENAME PLAYLIST
@@ -242,6 +245,41 @@ public class PlaylistControlller {
             );
         }
 
-        return "redirect:/playlist/myList/" + playlistId;
+        return "redirect:/usr/myplaylist/" + playlistId;
+    }
+    
+    
+    @PostMapping("/addSongByName")
+    public String addSongByName(@RequestParam String songName,
+                                @RequestParam Long playlistId) {
+
+        Songs song = songServices.findByTitle(songName);
+
+        if(song != null){
+
+            playlistService.addSongToPlaylist(playlistId, song);
+
+        }
+
+        return "redirect:/usr/myplaylist/" + playlistId;
+    }
+    @PostMapping("/addSongById")
+    public String addSongById(@RequestParam Long playlistId,
+                                    @RequestParam Long songId){
+    	
+    	Songs song = songServices.getSongById(songId);
+
+        playlistService.addSongToPlaylist(
+                playlistId,
+                song
+        );
+
+         return "redirect:/usr/nowPlaying?songId=" + songId;
+    }
+    
+    public void increaseSongCount(@RequestParam Long songId){
+
+        songServices.increaseSongCount(songId);
+
     }
 }

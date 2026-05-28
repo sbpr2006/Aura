@@ -71,32 +71,99 @@
 <!-- PLAYER STYLE -->
 
 <style>
+	/* BOTTOM NAVIGATION */
+	.bottom-nav{
 
-.player-bar{
+	    position:fixed;
 
-    position:fixed;
+	    bottom:0;
 
-    bottom:0;
-    left:0;
+	    left:0;
 
-    width:100%;
-    height:85px;
+	    width:100%;
 
-    background:#111;
+	    height:75px;
 
-    border-top:1px solid #333;
+	    background:#000;
 
-    display:flex;
+	    border-top:1px solid #222;
 
-    justify-content:space-between;
-    align-items:center;
+	    display:flex;
 
-    padding:0 25px;
+	    justify-content:space-around;
 
-    z-index:9999;
-	cursor:pointer;
-	transition:0.3s ease;
-}
+	    align-items:center;
+
+	    z-index:1000;
+	}
+
+	/* NAV ITEMS */
+
+	.bottom-nav a{
+
+	    flex:1;
+
+	    height:100%;
+
+	    display:flex;
+
+	    flex-direction:column;
+
+	    justify-content:center;
+
+	    align-items:center;
+
+	    text-decoration:none;
+
+	    color:#b3b3b3;
+
+	    font-size:13px;
+
+	    transition:0.3s;
+	}
+
+	.bottom-nav a:hover{
+
+	    color:#8b5cf6;
+
+	    background:rgba(255,255,255,0.03);
+	}
+
+	/* ICONS */
+
+	.bottom-nav i{
+
+	    font-size:20px;
+
+	    margin-bottom:4px;
+	}
+
+	.player-bar{
+
+	    position:fixed;
+
+	    bottom:65px;
+
+	    left:0;
+
+	    width:100%;
+
+	    background:rgba(10,10,10,0.95);
+
+	    backdrop-filter:blur(10px);
+
+	    border-top:1px solid #333;
+
+	    padding:15px 25px;
+
+	    z-index:999;
+
+	    display:flex;
+
+	    justify-content:space-between;
+
+	    align-items:center;
+	}
 .player-bar:hover{
 
     background:#181818;
@@ -286,6 +353,22 @@
         }
     }
 
+	
+	// NEXT SONG
+	    function nextSong() {
+	        if (songs.length === 0) return;
+	        currentSongIndex = (currentSongIndex + 1) % songs.length;
+	        playSong(songs[currentSongIndex]);
+	    }
+
+	    // PREVIOUS SONG
+	    function prevSong() {
+	        if (songs.length === 0) return;
+	        currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+	        playSong(songs[currentSongIndex]);
+	    }
+		
+		
     // SAVE CURRENT TIME
 
     audioPlayer.addEventListener(
@@ -309,6 +392,13 @@
 	            "/usr/nowPlaying?songId=" + (songId || "");
 	    }
 </script>
+<!-- BOTTOM NAVIGATION -->
+<div class="bottom-nav">
+    <a href="/usr/home"><i class="fa-solid fa-house"></i> Home</a>
+    <a href="/usr/search"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
+    <a href="/usr/playlists"><i class="fa-solid fa-music"></i> Playlists</a>
+    <a href="/usr/profile"><i class="fa-solid fa-user"></i> Profile</a>
+</div>
 
 </body>
 </html>

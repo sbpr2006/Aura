@@ -260,7 +260,7 @@
 
         </a>
 
-		<a href="/usr/playlist" class="btn btn-outline-light">Back</a>
+		<a href="/usr/playlists" class="btn btn-outline-light">Back</a>
 		   
 
     </div>
@@ -290,6 +290,31 @@
             </span>
 
         </p>
+		<!-- ADD THIS INSIDE playlist-header DIV -->
+		<div class="d-flex flex-wrap gap-3 mt-4">
+
+		    <!-- PLAY ALL BUTTON -->
+
+		    <button class="btn btn-lg btn-light px-4 fw-bold"
+		            onclick="playAllSongs()">
+
+		        <i class="fa-solid fa-play me-2"></i>
+		        Play All
+
+		    </button>
+
+		    <!-- ADD SONG BUTTON -->
+
+		    <button class="btn btn-lg btn-outline-light px-4 fw-bold"
+		            data-bs-toggle="modal"
+		            data-bs-target="#addSongModal">
+
+		        <i class="fa-solid fa-plus me-2"></i>
+		        Add Song
+
+		    </button>
+
+		</div>
 
     </div>
 
@@ -379,7 +404,118 @@
 
 	    </div>
 	</div>
+	<!-- ADD SONG MODAL -->
 
+	<div class="modal fade"
+	     id="addSongModal"
+	     tabindex="-1">
+
+	    <div class="modal-dialog modal-dialog-centered">
+
+	        <div class="modal-content bg-dark text-light border-0 rounded-4">
+
+	            <div class="modal-header border-secondary">
+
+	                <h5 class="modal-title">
+
+	                    Add Song To Playlist
+
+	                </h5>
+
+	                <button type="button"
+	                        class="btn-close btn-close-white"
+	                        data-bs-dismiss="modal">
+
+	                </button>
+
+	            </div>
+
+	            <form th:action="@{/playlist/addSongByName}"
+	                  method="post">
+
+	                <div class="modal-body">
+
+	                    <input type="hidden"
+	                           name="playlistId"
+	                           th:value="${playlist.playlistId}">
+
+	                    <!-- SONG NAME -->
+
+	                    <label class="mb-2">
+
+	                        Song Name
+
+	                    </label>
+
+	                    <input type="text"
+	                           class="form-control bg-secondary text-light border-0"
+	                           name="songName"
+	                           placeholder="Enter Song Name"
+	                           required>
+
+	                </div>
+
+	                <div class="modal-footer border-secondary">
+
+	                    <button type="submit"
+	                            class="btn btn-primary">
+
+	                        Add Song
+
+	                    </button>
+
+	                </div>
+
+	            </form>
+
+	        </div>
+
+	    </div>
+
+	</div>
+	<script>
+
+	    function playSong(button){
+	        const title  = button.getAttribute("data-title");
+	        const artist = button.getAttribute("data-artist");
+	        const image  = button.getAttribute("data-image");
+	        const audio  = button.getAttribute("data-audio");
+	        const songId = button.getAttribute("data-songid");
+
+	        localStorage.setItem("currentTitle", title);
+	        localStorage.setItem("currentArtist", artist);
+	        localStorage.setItem("currentImage", image);
+	        localStorage.setItem("currentSong", audio);
+	        localStorage.setItem("currentSongId", songId);
+
+	        if(window.globalAudioPlayer){
+
+	            window.globalAudioPlayer.src = audio;
+	            window.globalAudioPlayer.play();
+
+	        }
+
+	        location.reload();
+
+						fetch("/usr/song/incrementRepeat?songId=" + songId, {
+			    method:"POST"
+			});
+	    }
+
+	    /* PLAY ALL SONGS */
+
+	    function playAllSongs(){
+
+	        const songs = document.querySelectorAll(".play-btn");
+
+	        if(songs.length > 0){
+
+	            songs[0].click();
+
+	        }
+	    }
+
+	</script>
 <script src="/player.js"></script>
 <div th:replace="player.html"></div>
 

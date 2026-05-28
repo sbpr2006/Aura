@@ -46,7 +46,7 @@ public class Songs {
     private String imagePath;
     
     @Column
-    private int repeatedCount;
+    private Long repeatedCount;
 
 
    

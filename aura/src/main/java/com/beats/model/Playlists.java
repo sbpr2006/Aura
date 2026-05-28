@@ -36,7 +36,7 @@ public class Playlists {
     private String playlistName;
 
     @Column
-    private int playedCount;
+    private Long playedCount;
 
 
 }

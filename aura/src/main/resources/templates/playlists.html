@@ -426,6 +426,7 @@
     </div>
 
 	<div th:each="playlist : ${playlists}"
+		 th:if="${playlist.playlistName != 'FavouriteList'}"
 	     class="playlist-card animate__animated animate__fadeInUp mb-4">
 
 	    <!-- CLICKABLE PLAYLIST CARD -->

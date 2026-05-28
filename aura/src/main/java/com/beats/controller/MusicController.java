@@ -12,11 +12,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.beats.model.Playlists;
 import com.beats.model.Songs;
 import com.beats.model.Users;
 import com.beats.repository.MusicRepository;
+import com.beats.repository.PlaylistRepository;
+import com.beats.repository.PlaylistSongsRepository;
+import com.beats.repository.SongRepository;
 import com.beats.services.PlaylistService;
 import com.beats.services.SongServices;
 import com.beats.services.UserService;
@@ -32,6 +36,12 @@ public class MusicController {
 	PlaylistService playlistService;
 	@Autowired
 	MusicRepository musicRepo;
+	@Autowired
+	SongRepository songRepo;
+	@Autowired
+	PlaylistSongsRepository playlistSongsRepo;
+	@Autowired
+	PlaylistRepository playlistRepo;
 	@Autowired
 	UserService userService;
 	
@@ -237,7 +247,7 @@ public class MusicController {
     }
     
     @GetMapping("/myplaylist/{playlistId}")
-    public String openFavouritePlaylist(@PathVariable long playlistId,
+    public String openPlaylist(@PathVariable long playlistId,
             HttpSession session,
             Model model) {
         Users user = (Users) session.getAttribute("loggedUser");
@@ -276,13 +286,31 @@ public class MusicController {
         if (user == null) return "redirect:/usr/loginPage";
         if (songId == null) return "redirect:/usr/home";
         boolean  isFavourite=playlistService.isSongInFavourites(user,songId);
-
+        List<Playlists> userPlaylists =
+                playlistService.getPlaylistsByUser(user.getUserId());
         Songs song = songServices.getSongById(songId);
         model.addAttribute("song", song);
         model.addAttribute("isFavourite", isFavourite);
+        model.addAttribute("userPlaylists", userPlaylists);
         return "now_playing";
     }
     
+    @ResponseBody
+    @PostMapping("/song/incrementRepeat")
+    public void increaseRepeatedCount(@RequestParam Long songId){
+
+        Songs song = songRepo.findBySongId(songId);
+        Long current = song.getRepeatedCount();
+        if(current == null){
+            current = 0L;
+        }
+        song.setRepeatedCount(current + 1);
+        songRepo.save(song);
+    }
+    @ResponseBody
+    public void updatePlayedCount(){
+    	playlistService.refreshAllPlaylistCounts();
+    }
     
     
     

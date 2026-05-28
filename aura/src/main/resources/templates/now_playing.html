@@ -442,7 +442,29 @@
                 font-size:45px;
             }
         }
+		
+		.dropdown-menu{
 
+		    background:rgba(20,20,35,0.95);
+
+		    backdrop-filter:blur(10px);
+
+		    min-width:230px;
+		}
+
+		.dropdown-item{
+
+		    color:#ffffff;
+
+		    transition:0.3s;
+		}
+
+		.dropdown-item:hover{
+
+		    background:rgba(139,92,246,0.25);
+
+		    color:#d7b8ff;
+		}
     </style>
 </head>
 
@@ -475,7 +497,53 @@
         <div class="artist-row">
             <div class="artist-name" id="playerArtist" th:text="${song != null ? song.artist : ''}">Lumina Specter</div>
             <div class="song-badges">
-                <div class="lossless">LOSSLESS</div>
+				<!-- ADD TO PLAYLIST DROPDOWN -->
+
+				<div class="dropdown">
+
+				    <button class="btn btn-sm btn-outline-light dropdown-toggle px-3 py-2"
+				            type="button"
+				            data-bs-toggle="dropdown">
+
+				        <i class="fa-solid fa-plus me-2"></i>
+
+				        Add To Playlist
+
+				    </button>
+
+				    <ul class="dropdown-menu dropdown-menu-dark rounded-4 border-0 shadow">
+
+				        <li th:each="pl : ${userPlaylists}">
+
+				            <form th:action="@{/playlist/addSongById}"
+				                  method="post">
+
+				                <input type="hidden"
+				                       name="playlistId"
+				                       th:value="${pl.playlistId}">
+
+				                <input type="hidden"
+				                       name="songId"
+				                       th:value="${song.songId}">
+
+				                <button type="submit"
+				                        class="dropdown-item py-2">
+
+				                    <i class="fa-solid fa-music me-2"></i>
+
+				                    <span th:text="${pl.playlistName}">
+				                        Chill Vibes
+				                    </span>
+
+				                </button>
+
+				            </form>
+
+				        </li>
+
+				    </ul>
+
+				</div>
 				<button class="btn btn-sm text-danger"
 
 				        th:attr="data-songid=${song.songId}"
@@ -703,8 +771,8 @@
             .then(r => r.json())
             .then(loadSong)
             .catch(() => {});
-    });
-
+	    });
+		
     // ─── AUTO-NEXT ON END ────────────────────────────────────────────────────
     audio.addEventListener("ended", () => {
         if (isRepeat) {
@@ -718,17 +786,21 @@
     // ─── LOAD SONG (from API response) ───────────────────────────────────────
     function loadSong(song) {
         if (!song || !song.filePath) return;
-
+		
         audio.src = song.filePath;
         audio.play().catch(() => {});
 
         playerTitle.textContent  = song.title  || "";
         playerArtist.textContent = song.artist || "";
         playerImage.src          = song.imagePath || "";
-
+		
+		fetch("/usr/song/incrementRepeat?songId=" + song.songId, {
+			    method:"POST"
+			});
         localStorage.setItem("currentSong",   song.filePath);
         localStorage.setItem("currentTitle",  song.title  || "");
         localStorage.setItem("currentArtist", song.artist || "");
+		localStorage.setItem("currentSongId",  song.songId  || "");
         localStorage.setItem("currentImage",  song.imagePath || "");
         localStorage.setItem("currentTime",   "0");
         localStorage.setItem("isPlaying",     "true");

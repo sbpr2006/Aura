@@ -3,6 +3,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.beats.model.PlaylistSongs;
 import com.beats.model.Playlists;
@@ -16,6 +17,7 @@ public class PlaylistService {
 	PlaylistRepository playlistRepo;
 	@Autowired
 	PlaylistSongsRepository playlistSongsRepo;
+	
 	
 	public List<Playlists> getTrendingPlaylists() {
 	    return playlistRepo.findTop10ByOrderByPlayedCountDesc();
@@ -143,6 +145,13 @@ public class PlaylistService {
 	            favouritePlaylist.getPlaylistId(),
 	            songId
 	    );
+	}
+
+	@Transactional
+	public void refreshAllPlaylistCounts(){
+
+	    playlistRepo.refreshAllPlaylistPlayedCounts();
+
 	}
 	
 

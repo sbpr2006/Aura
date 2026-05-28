@@ -150,7 +150,7 @@ globalAudioPlayer.addEventListener(
 // PLAY SONG FUNCTION
 
 function playSong(button) {
-
+	
     const songId =
         button.getAttribute("data-songid");
 
@@ -271,4 +271,7 @@ function playSong(button) {
             console.error(error);
 
         });
+		fetch("/usr/song/incrementRepeat?songId=" + songId, {
+			    method:"POST"
+			});
 }

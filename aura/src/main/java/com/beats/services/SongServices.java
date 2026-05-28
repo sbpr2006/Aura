@@ -63,4 +63,57 @@ public class SongServices {
 	            .findBySongId(songId);
 	
 	}
+
+	public Songs findByTitle(String songName) {
+		return songRepo.findByTitleIgnoreCase(songName);
+	}
+
+	public void increaseSongCount(Long songId){
+
+	    Songs song = songRepo.findBySongId(songId);
+	
+	    // INCREASE SONG COUNT
+	
+	    Long current = song.getRepeatedCount();
+	
+	    song.setRepeatedCount(current + 1);
+	
+	    songRepo.save(song);
+	
+	    // UPDATE PLAYLIST COUNTS
+	    List<PlaylistSongs> playlistSongs =
+	
+	            playlistSongsRepo.findBySongSongId(songId);
+	
+	    // UPDATE EACH PLAYLIST COUNT
+	
+	    for(PlaylistSongs ps : playlistSongs){
+	
+	        Playlists playlist =
+	                ps.getPlaylist();
+	
+	        List<PlaylistSongs> songsInPlaylist =
+	
+	                playlistSongsRepo
+	                .findByPlaylist_PlaylistId(
+	                        playlist.getPlaylistId()
+	                );
+	
+	        Long total = 0L;
+	
+	        for(PlaylistSongs item : songsInPlaylist){
+	
+	            Songs s = item.getSong();
+	
+	            if(s.getRepeatedCount() != null){
+	
+	                total += s.getRepeatedCount();
+	            }
+	        }
+	
+	        playlist.setPlayedCount(total);
+	
+	        playlistRepo.save(playlist);
+	    }
+	}
 }

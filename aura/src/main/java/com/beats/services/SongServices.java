@@ -116,4 +116,12 @@ public class SongServices {
 	        playlistRepo.save(playlist);
 	    }
 	}
+
+	public List<Songs> searchSongs(String query) {
+		 return songRepo
+		            .findByTitleContainingIgnoreCaseOrAlbumContainingIgnoreCase(
+		                    query,
+		                    query
+		            );
+		}
 }

@@ -1,1118 +1,3 @@
-
-
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AURA - Playlists</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
-    <!-- Animate CSS -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-    <style>
-
-        body{
-
-            background:
-                    linear-gradient(rgba(0,0,0,0.88),
-                    rgba(0,0,0,0.95)),
-                    url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1470&auto=format&fit=crop');
-
-            background-size:cover;
-            background-attachment:fixed;
-
-            font-family:'Segoe UI',sans-serif;
-
-            color:white;
-
-            min-height:100vh;
-        }
-
-        /* NAVBAR */
-
-        .navbar{
-
-            background:rgba(0,0,0,0.75);
-
-            backdrop-filter:blur(10px);
-
-            box-shadow:0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .navbar-brand{
-
-            color:#9d6bff !important;
-
-            font-size:32px;
-
-            font-weight:800;
-
-            letter-spacing:2px;
-        }
-
-        /* SECTION */
-
-        .section-title{
-
-            color:#9d6bff;
-
-            font-weight:bold;
-
-            margin-bottom:25px;
-        }
-
-        /* PLAYLIST CARD */
-
-        .playlist-card{
-
-            background:rgba(20,20,20,0.92);
-
-            border-radius:25px;
-
-            padding:25px;
-
-            margin-bottom:35px;
-
-            box-shadow:0 10px 30px rgba(0,0,0,0.5);
-
-            transition:0.4s;
-        }
-
-        .playlist-card:hover{
-
-            transform:translateY(-6px);
-
-            box-shadow:0 15px 35px rgba(157,107,255,0.25);
-        }
-
-        /* FAVORITES */
-
-        .favorites-card{
-
-            background:
-                    linear-gradient(135deg,
-                    rgba(157,107,255,0.18),
-                    rgba(255,77,109,0.12));
-
-            border:1px solid rgba(157,107,255,0.3);
-        }
-
-        .favorite-icon{
-            color:#ff4d6d;
-        }
-
-        /* SONG ITEM */
-
-        .song-item{
-
-            background:#1f1f1f;
-
-            border-radius:18px;
-
-            padding:15px;
-
-            margin-top:15px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            transition:0.3s;
-        }
-
-        .song-item:hover{
-
-            background:#2a2a2a;
-
-            transform:scale(1.01);
-        }
-
-        .song-info{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:15px;
-        }
-
-        .song-info img{
-
-            width:65px;
-            height:65px;
-
-            border-radius:15px;
-
-            object-fit:cover;
-        }
-
-        .song-title{
-
-            font-size:18px;
-
-            font-weight:bold;
-        }
-
-        .artist{
-
-            color:#b3b3b3;
-
-            font-size:14px;
-        }
-
-        /* ACTION ICONS */
-
-        .song-actions i{
-
-            font-size:18px;
-
-            margin-left:18px;
-
-            cursor:pointer;
-
-            transition:0.3s;
-        }
-
-        .song-actions i:hover{
-
-            color:#9d6bff;
-
-            transform:scale(1.2);
-        }
-
-        /* BUTTONS */
-
-        .btn-aura{
-
-            background:
-                    linear-gradient(to right,
-                    #9d6bff,
-                    #7c3aed);
-
-            border:none;
-
-            color:white;
-
-            border-radius:12px;
-
-            padding:10px 18px;
-
-            font-weight:bold;
-
-            transition:0.3s;
-        }
-
-        .btn-aura:hover{
-
-            transform:scale(1.03);
-
-            box-shadow:0 0 15px rgba(157,107,255,0.5);
-        }
-
-        .btn-delete{
-
-            background:#ff4d4d;
-
-            border:none;
-
-            color:white;
-
-            border-radius:12px;
-
-            padding:10px 18px;
-        }
-
-        .btn-delete:hover{
-
-            background:#ff1f1f;
-        }
-
-        /* INPUT */
-
-        .form-control{
-
-            background:#222;
-
-            border:none;
-
-            color:white;
-
-            border-radius:14px;
-
-            padding:13px;
-        }
-
-        .form-control:focus{
-
-            background:#2d2d2d;
-
-            color:white;
-
-            border:1px solid #9d6bff;
-
-            box-shadow:none;
-        }
-
-        /* CREATE PLAYLIST */
-
-        .create-playlist{
-
-            background:rgba(20,20,20,0.92);
-
-            border-radius:25px;
-
-            padding:30px;
-
-            margin-top:40px;
-
-            margin-bottom:50px;
-
-            box-shadow:0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* RESPONSIVE */
-
-        @media(max-width:768px){
-
-            .song-item{
-
-                flex-direction:column;
-
-                align-items:flex-start;
-
-                gap:15px;
-            }
-
-            .song-actions{
-
-                width:100%;
-
-                display:flex;
-
-                justify-content:flex-end;
-            }
-        }
-
-    </style>
-</head>
-
-<body>
-
-<!-- NAVBAR -->
-
-<nav class="navbar navbar-expand-lg navbar-dark px-4">
-
-    <div class="container-fluid">
-
-        <a class="navbar-brand animate__animated animate__fadeInLeft"
-           href="#">
-
-            AURA
-
-        </a>
-
-        <button class="btn btn-outline-light">
-
-            <i class="fa-solid fa-house"></i>
-
-            Home
-
-        </button>
-
-    </div>
-
-</nav>
-
-<!-- MAIN CONTAINER -->
-
-<div class="container mt-5">
-
-    <!-- FAVORITES SECTION -->
-
-    <div class="playlist-card favorites-card animate__animated animate__fadeInUp">
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-
-            <div>
-
-                <h2 class="section-title">
-
-                    <i class="fa-solid fa-heart favorite-icon"></i>
-
-                    Favourite Songs
-
-                </h2>
-
-                <p class="text-secondary">
-
-                    Your liked songs collection
-
-                </p>
-
-            </div>
-
-        </div>
-
-        <!-- FAVORITE SONGS -->
-
-        <div th:each="song : ${favouriteSongs}">
-
-            <div class="song-item">
-
-                <div class="song-info">
-
-                    <img th:src="${song.imageUrl}"
-                         src="https://picsum.photos/200">
-
-                    <div>
-
-                        <div class="song-title"
-                             th:text="${song.title}">
-                            Perfect
-                        </div>
-
-                        <div class="artist"
-                             th:text="${song.artist}">
-                            Ed Sheeran
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="song-actions">
-
-                    <i class="fa-solid fa-play"></i>
-
-                    <i class="fa-solid fa-heart favorite-icon"></i>
-
-                    <i class="fa-solid fa-trash"></i>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- OTHER PLAYLISTS -->
-
-    <h2 class="section-title mb-4 animate__animated animate__fadeIn">
-
-        Your Playlists
-
-    </h2>
-
-    <div th:each="playlist : ${playlists}"
-         class="playlist-card animate__animated animate__fadeInUp">
-
-        <!-- PLAYLIST HEADER -->
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-
-            <div>
-
-                <h3 class="text-light fw-bold"
-                    th:text="${playlist.name}">
-
-                    Chill Vibes
-
-                </h3>
-
-                <p class="text-secondary">
-
-                    Songs:
-                    <span th:text="${#lists.size(playlist.songs)}">
-                        10
-                    </span>
-
-                </p>
-
-            </div>
-
-            <div class="mt-3 mt-md-0">
-
-                <button class="btn btn-aura me-2">
-
-                    <i class="fa-solid fa-pen"></i>
-
-                    Rename
-
-                </button>
-
-                <button class="btn btn-delete">
-
-                    <i class="fa-solid fa-trash"></i>
-
-                    Delete
-
-                </button>
-
-            </div>
-
-        </div>
-
-        <!-- SONG LIST -->
-
-        <div th:each="song : ${playlist.songs}">
-
-            <div class="song-item">
-
-                <div class="song-info">
-
-                    <img th:src="${song.imageUrl}"
-                         src="https://picsum.photos/200">
-
-                    <div>
-
-                        <div class="song-title"
-                             th:text="${song.title}">
-                            Song Name
-                        </div>
-
-                        <div class="artist"
-                             th:text="${song.artist}">
-                            Artist
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="song-actions">
-
-                    <i class="fa-solid fa-play"></i>
-
-                    <i class="fa-solid fa-heart"></i>
-
-                    <i class="fa-solid fa-trash"></i>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- ADD SONG -->
-
-        <form th:action="@{/playlist/addSong}"
-              method="post"
-              class="mt-4">
-
-            <div class="row">
-
-                <div class="col-md-9 mb-3">
-
-                    <input type="text"
-                           name="songName"
-                           class="form-control"
-                           placeholder="Add song to playlist">
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <button class="btn btn-aura w-100">
-
-                        <i class="fa-solid fa-plus"></i>
-
-                        Add Song
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-    </div>
-
-    <!-- CREATE PLAYLIST -->
-
-    <div class="create-playlist animate__animated animate__fadeInUp">
-
-        <h2 class="section-title">
-
-            Create New Playlist
-
-        </h2>
-
-        <form th:action="@{/playlist/create}"
-              method="post">
-
-            <div class="row">
-
-                <div class="col-md-9 mb-3">
-
-                    <input type="text"
-                           class="form-control"
-                           name="playlistName"
-                           placeholder="Enter playlist name"
-                           required>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <button class="btn btn-aura w-100">
-
-                        <i class="fa-solid fa-music"></i>
-
-                        Create Playlist
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-<!-- Bootstrap JS -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
-
-while clicking onthe list  renders to a page containing list of songs
-myList.htnl:
-list name
-list of songs
-remove song from playlist
-play song
-add highlist the song while its currently playing
-
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AURA - My Playlist</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
-    <!-- Animate CSS -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-    <style>
-
-        body{
-
-            background:
-                    linear-gradient(rgba(0,0,0,0.88),
-                    rgba(0,0,0,0.96)),
-                    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1470&auto=format&fit=crop');
-
-            background-size:cover;
-            background-attachment:fixed;
-
-            color:white;
-
-            font-family:'Segoe UI',sans-serif;
-
-            min-height:100vh;
-
-            padding-bottom:120px;
-        }
-
-        /* NAVBAR */
-
-        .navbar{
-
-            background:rgba(0,0,0,0.75);
-
-            backdrop-filter:blur(10px);
-
-            box-shadow:0 3px 12px rgba(0,0,0,0.4);
-        }
-
-        .navbar-brand{
-
-            color:#9d6bff !important;
-
-            font-size:32px;
-
-            font-weight:800;
-
-            letter-spacing:2px;
-        }
-
-        /* PLAYLIST HEADER */
-
-        .playlist-header{
-
-            background:
-                    linear-gradient(to right,
-                    rgba(157,107,255,0.25),
-                    rgba(124,58,237,0.15));
-
-            border-radius:30px;
-
-            padding:35px;
-
-            margin-top:40px;
-
-            margin-bottom:35px;
-
-            box-shadow:0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .playlist-name{
-
-            font-size:42px;
-
-            font-weight:800;
-
-            color:#ffffff;
-        }
-
-        .playlist-info{
-
-            color:#cfcfcf;
-
-            margin-top:10px;
-        }
-
-        /* SONG LIST */
-
-        .song-card{
-
-            background:rgba(24,24,24,0.95);
-
-            border-radius:22px;
-
-            padding:18px;
-
-            margin-bottom:18px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            transition:0.3s;
-
-            border:1px solid transparent;
-        }
-
-        .song-card:hover{
-
-            transform:translateY(-4px);
-
-            background:#232323;
-
-            border:1px solid rgba(157,107,255,0.3);
-        }
-
-        /* CURRENTLY PLAYING */
-
-        .playing{
-
-            background:
-                    linear-gradient(to right,
-                    rgba(157,107,255,0.22),
-                    rgba(124,58,237,0.18));
-
-            border:1px solid #9d6bff;
-
-            box-shadow:0 0 18px rgba(157,107,255,0.4);
-        }
-
-        .playing .song-title{
-
-            color:#b48cff;
-        }
-
-        .playing-animation{
-
-            color:#9d6bff;
-
-            margin-left:10px;
-
-            animation:pulse 1s infinite;
-        }
-
-        @keyframes pulse{
-
-            0%{
-                opacity:0.4;
-            }
-
-            50%{
-                opacity:1;
-            }
-
-            100%{
-                opacity:0.4;
-            }
-        }
-
-        /* SONG INFO */
-
-        .song-info{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:18px;
-        }
-
-        .song-info img{
-
-            width:75px;
-
-            height:75px;
-
-            border-radius:18px;
-
-            object-fit:cover;
-        }
-
-        .song-title{
-
-            font-size:20px;
-
-            font-weight:bold;
-        }
-
-        .artist{
-
-            color:#b3b3b3;
-
-            margin-top:4px;
-        }
-
-        /* SONG ACTIONS */
-
-        .song-actions i{
-
-            font-size:20px;
-
-            margin-left:22px;
-
-            cursor:pointer;
-
-            transition:0.3s;
-        }
-
-        .song-actions i:hover{
-
-            color:#9d6bff;
-
-            transform:scale(1.2);
-        }
-
-        .play-btn{
-
-            color:#9d6bff;
-        }
-
-        .delete-btn{
-
-            color:#ff4d4d;
-        }
-
-        /* PLAYER BAR */
-
-        .player-bar{
-
-            position:fixed;
-
-            bottom:0;
-
-            left:0;
-
-            width:100%;
-
-            background:#111;
-
-            border-top:1px solid #333;
-
-            padding:15px 25px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            z-index:999;
-        }
-
-        .now-playing{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:15px;
-        }
-
-        .now-playing img{
-
-            width:60px;
-
-            height:60px;
-
-            border-radius:15px;
-        }
-
-        .player-controls i{
-
-            font-size:24px;
-
-            margin:0 18px;
-
-            cursor:pointer;
-
-            transition:0.3s;
-        }
-
-        .player-controls i:hover{
-
-            color:#9d6bff;
-        }
-
-        .main-play{
-
-            font-size:36px !important;
-
-            color:#9d6bff;
-        }
-
-        /* RESPONSIVE */
-
-        @media(max-width:768px){
-
-            .song-card{
-
-                flex-direction:column;
-
-                align-items:flex-start;
-
-                gap:15px;
-            }
-
-            .song-actions{
-
-                width:100%;
-
-                display:flex;
-
-                justify-content:flex-end;
-            }
-
-            .player-bar{
-
-                flex-direction:column;
-
-                gap:15px;
-            }
-
-            .playlist-name{
-
-                font-size:32px;
-            }
-        }
-
-    </style>
-</head>
-
-<body>
-
-<!-- NAVBAR -->
-
-<nav class="navbar navbar-expand-lg navbar-dark px-4">
-
-    <div class="container-fluid">
-
-        <a class="navbar-brand animate__animated animate__fadeInLeft"
-           href="#">
-
-            AURA
-
-        </a>
-
-        <button class="btn btn-outline-light">
-
-            <i class="fa-solid fa-arrow-left"></i>
-
-            Back
-
-        </button>
-
-    </div>
-
-</nav>
-
-<!-- MAIN CONTAINER -->
-
-<div class="container">
-
-    <!-- PLAYLIST HEADER -->
-
-    <div class="playlist-header animate__animated animate__fadeIn">
-
-        <h1 class="playlist-name"
-            th:text="${playlist.name}">
-
-            Chill Vibes
-
-        </h1>
-
-        <p class="playlist-info">
-
-            Total Songs:
-            <span th:text="${#lists.size(playlist.songs)}">
-                15
-            </span>
-
-        </p>
-
-    </div>
-
-    <!-- SONG LIST -->
-
-    <div th:each="song : ${playlist.songs}"
-
-         th:class="${song.playing} ?
-         'song-card playing animate__animated animate__fadeInUp'
-         :
-         'song-card animate__animated animate__fadeInUp'">
-
-        <!-- SONG INFO -->
-
-        <div class="song-info">
-
-            <img th:src="${song.imageUrl}"
-                 src="https://picsum.photos/200">
-
-            <div>
-
-                <div class="song-title">
-
-                    <span th:text="${song.title}">
-                        Perfect
-                    </span>
-
-                    <!-- CURRENTLY PLAYING ICON -->
-
-                    <i th:if="${song.playing}"
-                       class="fa-solid fa-wave-square playing-animation"></i>
-
-                </div>
-
-                <div class="artist"
-                     th:text="${song.artist}">
-
-                    Ed Sheeran
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- SONG ACTIONS -->
-
-        <div class="song-actions">
-
-            <!-- PLAY SONG -->
-
-            <i class="fa-solid fa-circle-play play-btn"
-               title="Play Song"></i>
-
-            <!-- REMOVE SONG -->
-
-            <i class="fa-solid fa-trash delete-btn"
-               title="Remove Song"></i>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- PLAYER BAR -->
-
-<div class="player-bar">
-
-    <!-- NOW PLAYING -->
-
-    <div class="now-playing">
-
-        <img src="https://picsum.photos/200">
-
-        <div>
-
-            <div class="fw-bold">
-                Perfect
-            </div>
-
-            <small class="text-secondary">
-                Ed Sheeran
-            </small>
-
-        </div>
-
-    </div>
-
-    <!-- PLAYER CONTROLS -->
-
-    <div class="player-controls">
-
-        <i class="fa-solid fa-backward-step"></i>
-
-        <i class="fa-solid fa-circle-play main-play"></i>
-
-        <i class="fa-solid fa-forward-step"></i>
-
-    </div>
-
-</div>
-
-<!-- Bootstrap -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
-
-search .html containing :
-search button and recent searches
-
-add player bar and home search  playlist buttons
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -1486,6 +371,55 @@ add player bar and home search  playlist buttons
                 padding:25px;
             }
         }
+		
+		.music-card{
+
+		    background:#181818;
+
+		    border:none;
+
+		    border-radius:20px;
+
+		    overflow:hidden;
+
+		    transition:0.3s;
+
+		    cursor:pointer;
+		}
+
+		.music-card:hover{
+
+            transform:translateY(-8px);
+
+            box-shadow:0 10px 25px rgba(0,0,0,0.6);
+        }
+		.play-btn{
+
+            width:45px;
+            height:45px;
+
+            background:#8b5cf6;
+
+            border-radius:50%;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            position:absolute;
+
+            bottom:20px;
+            right:20px;
+
+            opacity:0;
+
+            transition:0.3s;
+        }
+
+		.music-card:hover .play-btn{
+
+		    opacity:1;
+		}
 
     </style>
 </head>
@@ -1525,35 +459,32 @@ add player bar and home search  playlist buttons
 
         </h2>
 
-        <!-- SEARCH FORM -->
+        <!-- SEARCH INPUT -->
 
-        <form th:action="@{/search}"
-              method="get">
+        <div class="row">
 
-            <div class="row">
+            <div class="col-md-10 mb-3">
 
-                <div class="col-md-10 mb-3">
-
-                    <input type="text"
-                           name="query"
-                           class="form-control search-input"
-                           placeholder="Search songs, artists, playlists...">
-
-                </div>
-
-                <div class="col-md-2">
-
-                    <button class="btn search-btn w-100">
-
-                        Search
-
-                    </button>
-
-                </div>
+				<input type="text"
+				       id="searchInput"
+				       class="form-control search-input"
+				       placeholder="Search songs, albums...">
 
             </div>
 
-        </form>
+        </div>
+
+		<!-- SEARCH RESULTS -->
+
+		<div class="mt-4">
+
+		    <div id="searchResults"
+		         class="row g-4">
+
+		    </div>
+
+		</div>
+		
 
         <!-- RECENT SEARCHES -->
 
@@ -1597,73 +528,127 @@ add player bar and home search  playlist buttons
     </div>
 
 </div>
+<script src="/player.js"></script>
+<script>
+	const searchInput   = document.getElementById("searchInput");
+	const searchResults = document.getElementById("searchResults");
 
-<!-- PLAYER BAR -->
+	// ── Search ────────────────────────────────────────────────
+	searchInput.addEventListener("keyup", () => {
+	    const query = searchInput.value.trim();
+	    if (query.length === 0) { searchResults.innerHTML = ""; return; }
 
-<div class="player-bar">
+	    fetch("/usr/searchSongs?query=" + encodeURIComponent(query))
+	        .then(r => r.json())
+	        .then(data => {
+	            searchResults.innerHTML = "";
+	            if (data.length === 0) {
+	                searchResults.innerHTML = `<div class="text-center text-secondary mt-4">No songs found</div>`;
+	                return;
+	            }
+	            data.forEach(song => {
+	                searchResults.innerHTML += `
+	                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+	                        <div class="card music-card h-100 position-relative">
+	                            <img src="${song.imagePath}" class="card-img-top" style="height:200px;object-fit:cover;">
+	                            <div class="card-body">
+	                                <h6 class="fw-bold">${song.title}</h6>
+	                                <p class="text-secondary small mb-0">${song.artist}</p>
+	                            </div>
+	                            <button class="play-btn"
+	                                data-songid="${song.songId}"
+	                                data-title="${song.title}"
+	                                data-artist="${song.artist}"
+	                                data-image="${song.imagePath}"
+	                                data-audio="${song.filePath}"
+	                                onclick="playSong(this); addRecentSearch('${song.title}')">
+	                                <i class="fa-solid fa-play"></i>
+	                            </button>
+	                        </div>
+	                    </div>`;
+	            });
+	        });
+	});
 
-    <div class="song-info">
+	// ── Recent search card builder ────────────────────────────
+	function buildCard(query) {
+	    return `
+	        <div class="recent-card animate__animated animate__fadeInUp">
+	            <div class="recent-info">
+	                <div class="recent-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+	                <div class="recent-text">${query}</div>
+	            </div>
+	            <i class="fa-solid fa-xmark remove-search"></i>
+	        </div>`;
+	}
 
-        <img src="https://picsum.photos/200">
+	// ── FIX 1 — localStorage helpers ─────────────────────────
+	function getSaved() {
+	    return JSON.parse(localStorage.getItem("recentSearches") || "[]");
+	}
 
-        <div>
+	function saveToLocalStorage(query) {
+	    let saved = getSaved().filter(q => q !== query); // remove duplicate
+	    saved.unshift(query);                             // newest first
+	    saved = saved.slice(0, 10);                       // cap at 10
+	    localStorage.setItem("recentSearches", JSON.stringify(saved));
+	}
 
-            <div class="fw-bold">
-                Blinding Lights
-            </div>
+	function removeFromLocalStorage(query) {
+	    const saved = getSaved().filter(q => q !== query);
+	    localStorage.setItem("recentSearches", JSON.stringify(saved));
+	}
 
-            <small class="text-secondary">
-                The Weeknd
-            </small>
+	// ── Restore saved searches on page load ──────────────────
+	document.addEventListener("DOMContentLoaded", () => {
+	    const container = document.querySelector(".recent-searches");
+	    getSaved().forEach(query => container.insertAdjacentHTML("beforeend", buildCard(query)));
+	});
 
-        </div>
+	// ── Add a new recent search ───────────────────────────────
+	function addRecentSearch(query) {
+	    fetch("/usr/addRecentSearch?query=" + encodeURIComponent(query), { method: "POST" })
+	        .catch(console.error);
 
-    </div>
+	    saveToLocalStorage(query); // FIX 1 — persist
 
-    <!-- PLAYER CONTROLS -->
+	    const container = document.querySelector(".recent-searches");
 
-    <div class="player-controls">
+	    // Remove existing card for this query if present (avoid duplicates in DOM)
+	    container.querySelectorAll(".recent-text").forEach(el => {
+	        if (el.innerText.trim() === query) el.closest(".recent-card").remove();
+	    });
 
-        <i class="fa-solid fa-backward-step"></i>
+	    container.insertAdjacentHTML("beforeend", buildCard(query));
+	}
 
-        <i class="fa-solid fa-circle-play main-play"></i>
+	// ── FIX 2 — Event delegation (covers Thymeleaf + dynamic cards)
+	document.querySelector(".recent-searches").addEventListener("click", (e) => {
+	    const card = e.target.closest(".recent-card");
+	    if (!card) return;
 
-        <i class="fa-solid fa-forward-step"></i>
+	    if (e.target.closest(".remove-search")) {
+	        // ✕ button — remove card and update localStorage
+	        const text = card.querySelector(".recent-text").innerText.trim();
+	        removeFromLocalStorage(text);
+	        card.remove();
+	        return;
+	    }
 
-    </div>
+	    // Card body click — move to input and trigger search
+	    selectRecentSearch(card.querySelector(".recent-text").innerText.trim());
+	});
 
-</div>
+	// ── Select a recent search ────────────────────────────────
+	function selectRecentSearch(query) {
+	    searchInput.value = query;
+	    searchInput.dispatchEvent(new Event("keyup"));
+	    searchInput.scrollIntoView({ behavior: "smooth", block: "center" }); // scroll to input
+	    searchInput.focus();
+	}
+</script>
 
-<!-- BOTTOM NAVIGATION -->
-
-<div class="bottom-nav">
-
-    <a href="/home">
-
-        <i class="fa-solid fa-house"></i>
-
-        Home
-
-    </a>
-
-    <a href="/search"
-       class="active-nav">
-
-        <i class="fa-solid fa-magnifying-glass"></i>
-
-        Search
-
-    </a>
-
-    <a href="/playlists">
-
-        <i class="fa-solid fa-music"></i>
-
-        Playlists
-
-    </a>
-
-</div>
+<div th:replace="player.html"></div>
 
 <!-- Bootstrap -->
 

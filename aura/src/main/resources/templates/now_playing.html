@@ -468,405 +468,711 @@
     </style>
 </head>
 
-
 <body>
 
 <div class="player-container">
 
     <!-- TOP BAR -->
+
     <div class="top-bar">
-        <i class="fa-solid fa-chevron-down" onclick="history.back()"></i>
+
+        <i class="fa-solid fa-chevron-down"
+           onclick="history.back()"></i>
+
         <div class="album-info">
+
             <p>PLAYING FROM ALBUM</p>
-            <h5 id="albumName" th:text="${song != null ? song.album : ''}">Nocturnal Waves</h5>
+
+            <h5 id="albumName"
+                th:text="${song != null ? song.album : ''}">
+
+                Nocturnal Waves
+
+            </h5>
+
         </div>
+
         <i class="fa-solid fa-ellipsis-vertical"></i>
+
     </div>
 
     <!-- ALBUM COVER -->
+
     <div class="album-cover">
+
         <img id="playerImage"
+
              th:src="${song != null ? song.imagePath : ''}"
+
              src="https://images.unsplash.com/photo-1614149162883-504ce4d13909?q=80&w=800&auto=format&fit=crop"
+
              alt="Album Art">
+
     </div>
 
     <!-- SONG DETAILS -->
+
     <div class="song-details">
-        <div class="song-title" id="playerTitle" th:text="${song != null ? song.title : ''}">Ethereal Drift</div>
-        <div class="artist-row">
-            <div class="artist-name" id="playerArtist" th:text="${song != null ? song.artist : ''}">Lumina Specter</div>
-            <div class="song-badges">
-				<!-- ADD TO PLAYLIST DROPDOWN -->
 
-				<div class="dropdown">
+        <div class="song-title"
 
-				    <button class="btn btn-sm btn-outline-light dropdown-toggle px-3 py-2"
-				            type="button"
-				            data-bs-toggle="dropdown">
+             id="playerTitle"
 
-				        <i class="fa-solid fa-plus me-2"></i>
+             th:text="${song != null ? song.title : ''}">
 
-				        Add To Playlist
+            Ethereal Drift
 
-				    </button>
-
-				    <ul class="dropdown-menu dropdown-menu-dark rounded-4 border-0 shadow">
-
-				        <li th:each="pl : ${userPlaylists}">
-
-				            <form th:action="@{/playlist/addSongById}"
-				                  method="post">
-
-				                <input type="hidden"
-				                       name="playlistId"
-				                       th:value="${pl.playlistId}">
-
-				                <input type="hidden"
-				                       name="songId"
-				                       th:value="${song.songId}">
-
-				                <button type="submit"
-				                        class="dropdown-item py-2">
-
-				                    <i class="fa-solid fa-music me-2"></i>
-
-				                    <span th:text="${pl.playlistName}">
-				                        Chill Vibes
-				                    </span>
-
-				                </button>
-
-				            </form>
-
-				        </li>
-
-				    </ul>
-
-				</div>
-				<button class="btn btn-sm text-danger"
-
-				        th:attr="data-songid=${song.songId}"
-				        onclick="toggleFavourite(this)">
-
-						<i th:class="${isFavourite} ? 
-						'fa-solid fa-heart' : 
-						'fa-regular fa-heart'">
-						</i>
-
-				</button>
-            </div>
         </div>
+
+        <div class="artist-row">
+
+            <div class="artist-name"
+
+                 id="playerArtist"
+
+                 th:text="${song != null ? song.artist : ''}">
+
+                Lumina Specter
+
+            </div>
+
+            <div class="song-badges">
+
+                <!-- ADD TO PLAYLIST -->
+
+                <div class="dropdown">
+
+                    <button class="btn btn-sm btn-outline-light dropdown-toggle px-3 py-2"
+
+                            type="button"
+
+                            data-bs-toggle="dropdown">
+
+                        <i class="fa-solid fa-plus me-2"></i>
+
+                        Add To Playlist
+
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-dark rounded-4 border-0 shadow">
+
+                        <li th:each="pl : ${userPlaylists}">
+
+                            <form th:action="@{/playlist/addSongById}"
+
+                                  method="post">
+
+                                <input type="hidden"
+
+                                       name="playlistId"
+
+                                       th:value="${pl.playlistId}">
+
+                                <input type="hidden"
+
+                                       name="songId"
+
+                                       th:value="${song.songId}">
+
+                                <button type="submit"
+
+                                        class="dropdown-item py-2">
+
+                                    <i class="fa-solid fa-music me-2"></i>
+
+                                    <span th:text="${pl.playlistName}">
+
+                                        Chill Vibes
+
+                                    </span>
+
+                                </button>
+
+                            </form>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <!-- FAVOURITE -->
+
+                <button id="favoriteBtn"
+
+                        class="btn btn-sm text-danger"
+
+                        th:attr="data-songid=${song.songId}"
+
+                        onclick="toggleFavourite(this)">
+
+                    <i th:class="${isFavourite} ?
+
+                    'fa-solid fa-heart' :
+
+                    'fa-regular fa-heart'">
+
+                    </i>
+
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
     <!-- PROGRESS -->
+
     <div class="progress-section">
-        <div class="custom-progress" id="progressBar">
-            <div class="custom-progress-bar" id="progressFill"></div>
+
+        <div class="custom-progress"
+
+             id="progressBar">
+
+            <div class="custom-progress-bar"
+
+                 id="progressFill"></div>
+
         </div>
+
         <div class="time-row">
-            <span id="currentTime">0:00</span>
-            <span id="totalTime">0:00</span>
+
+            <span id="currentTime">
+
+                0:00
+
+            </span>
+
+            <span id="totalTime">
+
+                0:00
+
+            </span>
+
         </div>
+
     </div>
 
     <!-- CONTROLS -->
+
     <div class="controls">
-        <i class="fa-solid fa-shuffle" id="shuffleBtn"></i>
-        <i class="fa-solid fa-backward-step" id="prevBtn"></i>
-        <div class="play-button" id="playBtn">
-            <i class="fa-solid fa-play" id="playIcon"></i>
+
+        <i class="fa-solid fa-shuffle"
+
+           id="shuffleBtn"></i>
+
+        <i class="fa-solid fa-backward-step"
+
+           id="prevBtn"></i>
+
+        <div class="play-button"
+
+             id="playBtn">
+
+            <i class="fa-solid fa-play"
+
+               id="playIcon"></i>
+
         </div>
-        <i class="fa-solid fa-forward-step" id="nextBtn"></i>
-        <i class="fa-solid fa-repeat" id="repeatBtn"></i>
+
+        <i class="fa-solid fa-forward-step"
+
+           id="nextBtn"></i>
+
+        <i class="fa-solid fa-repeat"
+
+           id="repeatBtn"></i>
+
     </div>
 
 </div>
 
 <!-- BOTTOM NAV -->
+
 <div class="bottom-nav">
-    <a href="/usr/home" class="active-nav">
+
+    <a href="/usr/home"
+       class="active-nav">
+
         <i class="fa-solid fa-house"></i>
+
         Home
+
     </a>
+
     <a href="/usr/search">
+
         <i class="fa-solid fa-magnifying-glass"></i>
+
         Search
+
     </a>
+
     <a href="/usr/playlists">
+
         <i class="fa-solid fa-music"></i>
+
         Playlists
+
     </a>
+
 </div>
 
-<!-- Bootstrap -->
+<!-- BOOTSTRAP -->
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ─── PLAYER STATE ────────────────────────────────────────────────────────
-    const audio      = window.globalAudioPlayer || new Audio();
-    window.globalAudioPlayer = audio;
 
-    let isShuffle    = false;
-    let isRepeat     = false;
-    let isLiked      = false;
-    let isDragging   = false;
+const audio =
+    window.globalAudioPlayer || new Audio();
 
-    // ─── DOM REFS ─────────────────────────────────────────────────────────────
-    const playBtn      = document.getElementById("playBtn");
-    const playIcon     = document.getElementById("playIcon");
-    const playerTitle  = document.getElementById("playerTitle");
-    const playerArtist = document.getElementById("playerArtist");
-    const playerImage  = document.getElementById("playerImage");
-    const progressBar  = document.getElementById("progressBar");
-    const progressFill = document.getElementById("progressFill");
-    const currentTimeEl= document.getElementById("currentTime");
-    const totalTimeEl  = document.getElementById("totalTime");
-    const favoriteBtn  = document.getElementById("favoriteBtn");
-    const shuffleBtn   = document.getElementById("shuffleBtn");
-    const repeatBtn    = document.getElementById("repeatBtn");
-    const prevBtn      = document.getElementById("prevBtn");
-    const nextBtn      = document.getElementById("nextBtn");
+window.globalAudioPlayer = audio;
 
-    // ─── HELPERS ─────────────────────────────────────────────────────────────
-    function formatTime(sec) {
-        if (isNaN(sec)) return "0:00";
-        const m = Math.floor(sec / 60);
-        const s = Math.floor(sec % 60).toString().padStart(2, "0");
-        return `${m}:${s}`;
+// FLAGS
+
+let isShuffle = false;
+
+let isRepeat = false;
+
+// ELEMENTS
+
+const playBtn =
+    document.getElementById("playBtn");
+
+const playIcon =
+    document.getElementById("playIcon");
+
+const playerTitle =
+    document.getElementById("playerTitle");
+
+const playerArtist =
+    document.getElementById("playerArtist");
+
+const playerImage =
+    document.getElementById("playerImage");
+
+const progressBar =
+    document.getElementById("progressBar");
+
+const progressFill =
+    document.getElementById("progressFill");
+
+const currentTimeEl =
+    document.getElementById("currentTime");
+
+const totalTimeEl =
+    document.getElementById("totalTime");
+
+const shuffleBtn =
+    document.getElementById("shuffleBtn");
+
+const repeatBtn =
+    document.getElementById("repeatBtn");
+
+const prevBtn =
+    document.getElementById("prevBtn");
+
+const nextBtn =
+    document.getElementById("nextBtn");
+
+// FORMAT TIME
+
+function formatTime(sec){
+
+    if(isNaN(sec)) return "0:00";
+
+    const m =
+        Math.floor(sec / 60);
+
+    const s =
+        Math.floor(sec % 60)
+        .toString()
+        .padStart(2,"0");
+
+    return m + ":" + s;
+}
+
+// UPDATE PLAY ICON
+
+function updatePlayIcon(){
+
+    if(audio.paused){
+
+        playIcon.classList.remove("fa-pause");
+
+        playIcon.classList.add("fa-play");
+
+        playerImage.classList.remove("playing");
     }
 
-    function updatePlayIcon() {
-        if (audio.paused) {
-            playIcon.classList.replace("fa-pause", "fa-play");
-            playerImage.classList.remove("playing");
-        } else {
-            playIcon.classList.replace("fa-play", "fa-pause");
-            playerImage.classList.add("playing");
-        }
+    else{
+
+        playIcon.classList.remove("fa-play");
+
+        playIcon.classList.add("fa-pause");
+
+        playerImage.classList.add("playing");
+    }
+}
+
+// LOAD SAVED SONG
+
+window.addEventListener("load", () => {
+
+    const savedSong =
+        localStorage.getItem("currentSong");
+
+    const savedTitle =
+        localStorage.getItem("currentTitle");
+
+    const savedArtist =
+        localStorage.getItem("currentArtist");
+
+    const savedImage =
+        localStorage.getItem("currentImage");
+
+    const savedTime =
+        parseFloat(
+            localStorage.getItem("currentTime")
+        ) || 0;
+
+    const isPlaying =
+        localStorage.getItem("isPlaying");
+
+    if(savedSong){
+
+        audio.src = savedSong;
+
+        audio.currentTime = savedTime;
     }
 
-    // ─── RESTORE FROM LOCALSTORAGE ───────────────────────────────────────────
-    window.addEventListener("load", () => {
-        const savedSong   = localStorage.getItem("currentSong");
-        const savedTitle  = localStorage.getItem("currentTitle");
-        const savedArtist = localStorage.getItem("currentArtist");
-        const savedImage  = localStorage.getItem("currentImage");
-        const savedTime   = parseFloat(localStorage.getItem("currentTime")) || 0;
-        const wasPlaying  = localStorage.getItem("isPlaying") === "true";
+    if(savedTitle){
 
-        // Thymeleaf may have already injected values; only override if blank
-        if (savedSong && !audio.src) {
-            audio.src = savedSong;
-        }
-
-        if (savedTitle  && !playerTitle.textContent.trim())  playerTitle.textContent  = savedTitle;
-        if (savedArtist && !playerArtist.textContent.trim()) playerArtist.textContent = savedArtist;
-        if (savedImage  && playerImage.getAttribute("src") === "") playerImage.src = savedImage;
-
-        audio.addEventListener("loadedmetadata", () => {
-            audio.currentTime = savedTime;
-            totalTimeEl.textContent = formatTime(audio.duration);
-            if (wasPlaying) audio.play().catch(() => {});
-        }, { once: true });
-
-        // If src already loaded (cached)
-        if (audio.readyState >= 1) {
-            audio.currentTime = savedTime;
-            totalTimeEl.textContent = formatTime(audio.duration);
-            if (wasPlaying) audio.play().catch(() => {});
-        }
-
-        updatePlayIcon();
-    });
-
-    // ─── PLAY / PAUSE ────────────────────────────────────────────────────────
-    playBtn.addEventListener("click", () => {
-        if (audio.paused) {
-            audio.play().catch(err => console.warn("Play blocked:", err));
-        } else {
-            audio.pause();
-        }
-    });
-
-    audio.addEventListener("play",  () => {
-        updatePlayIcon();
-        localStorage.setItem("isPlaying", "true");
-    });
-
-    audio.addEventListener("pause", () => {
-        updatePlayIcon();
-        localStorage.setItem("isPlaying", "false");
-    });
-
-    // ─── PROGRESS BAR UPDATE ─────────────────────────────────────────────────
-    audio.addEventListener("timeupdate", () => {
-        if (isDragging) return;
-        localStorage.setItem("currentTime", audio.currentTime);
-
-        const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-        progressFill.style.width = pct + "%";
-        currentTimeEl.textContent = formatTime(audio.currentTime);
-        totalTimeEl.textContent   = formatTime(audio.duration);
-    });
-
-    // ─── SEEK ON CLICK ────────────────────────────────────────────────────────
-    progressBar.addEventListener("click", (e) => {
-        const rect = progressBar.getBoundingClientRect();
-        const pct  = (e.clientX - rect.left) / rect.width;
-        audio.currentTime = pct * audio.duration;
-    });
-
-    // ─── SEEK ON DRAG ────────────────────────────────────────────────────────
-    progressBar.addEventListener("mousedown", () => { isDragging = true; });
-    document.addEventListener("mouseup",  (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        const rect = progressBar.getBoundingClientRect();
-        const pct  = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-        audio.currentTime = pct * audio.duration;
-    });
-    document.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
-        const rect = progressBar.getBoundingClientRect();
-        const pct  = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-        progressFill.style.width = (pct * 100) + "%";
-        currentTimeEl.textContent = formatTime(pct * audio.duration);
-    });
-
-    // Touch support
-    progressBar.addEventListener("touchstart", () => { isDragging = true; }, { passive: true });
-    document.addEventListener("touchend", (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        const touch = e.changedTouches[0];
-        const rect  = progressBar.getBoundingClientRect();
-        const pct   = Math.min(Math.max((touch.clientX - rect.left) / rect.width, 0), 1);
-        audio.currentTime = pct * audio.duration;
-    });
-    document.addEventListener("touchmove", (e) => {
-        if (!isDragging) return;
-        const touch = e.changedTouches[0];
-        const rect  = progressBar.getBoundingClientRect();
-        const pct   = Math.min(Math.max((touch.clientX - rect.left) / rect.width, 0), 1);
-        progressFill.style.width = (pct * 100) + "%";
-        currentTimeEl.textContent = formatTime(pct * audio.duration);
-    }, { passive: true });
-
-    // ─── PREVIOUS / NEXT ─────────────────────────────────────────────────────
-    prevBtn.addEventListener("click", () => {
-        // If more than 3s in, restart current; else go to previous
-        if (audio.currentTime > 3) {
-            audio.currentTime = 0;
-        } else {
-            fetch("/api/songs/previous")
-                .then(r => r.json())
-                .then(loadSong)
-                .catch(() => { audio.currentTime = 0; });
-        }
-    });
-
-    nextBtn.addEventListener("click", () => {
-        fetch(`/api/songs/next${isShuffle ? "?shuffle=true" : ""}`)
-            .then(r => r.json())
-            .then(loadSong)
-            .catch(() => {});
-	    });
-		
-    // ─── AUTO-NEXT ON END ────────────────────────────────────────────────────
-    audio.addEventListener("ended", () => {
-        if (isRepeat) {
-            audio.currentTime = 0;
-            audio.play();
-        } else {
-            nextBtn.click();
-        }
-    });
-
-    // ─── LOAD SONG (from API response) ───────────────────────────────────────
-    function loadSong(song) {
-        if (!song || !song.filePath) return;
-		
-        audio.src = song.filePath;
-        audio.play().catch(() => {});
-
-        playerTitle.textContent  = song.title  || "";
-        playerArtist.textContent = song.artist || "";
-        playerImage.src          = song.imagePath || "";
-		
-		fetch("/usr/song/incrementRepeat?songId=" + song.songId, {
-			    method:"POST"
-			});
-        localStorage.setItem("currentSong",   song.filePath);
-        localStorage.setItem("currentTitle",  song.title  || "");
-        localStorage.setItem("currentArtist", song.artist || "");
-		localStorage.setItem("currentSongId",  song.songId  || "");
-        localStorage.setItem("currentImage",  song.imagePath || "");
-        localStorage.setItem("currentTime",   "0");
-        localStorage.setItem("isPlaying",     "true");
+        playerTitle.innerText =
+            savedTitle;
     }
 
-    // ─── SHUFFLE ─────────────────────────────────────────────────────────────
-    shuffleBtn.addEventListener("click", () => {
-        isShuffle = !isShuffle;
-        shuffleBtn.classList.toggle("active", isShuffle);
+    if(savedArtist){
+
+        playerArtist.innerText =
+            savedArtist;
+    }
+
+    if(savedImage){
+
+        playerImage.src =
+            savedImage;
+    }
+
+    if(isPlaying === "true"){
+
+        audio.play()
+        .catch(error => {
+
+            console.log(error);
+
+        });
+    }
+
+    updatePlayIcon();
+});
+
+// PLAY / PAUSE
+
+playBtn.addEventListener("click", () => {
+
+    if(audio.paused){
+
+        audio.play();
+    }
+
+    else{
+
+        audio.pause();
+    }
+});
+
+// PLAY EVENT
+
+audio.addEventListener("play", () => {
+
+    localStorage.setItem(
+        "isPlaying",
+        "true"
+    );
+
+    updatePlayIcon();
+});
+
+// PAUSE EVENT
+
+audio.addEventListener("pause", () => {
+
+    localStorage.setItem(
+        "isPlaying",
+        "false"
+    );
+
+    updatePlayIcon();
+});
+
+// TIME UPDATE
+
+audio.addEventListener("timeupdate", () => {
+
+    localStorage.setItem(
+        "currentTime",
+        audio.currentTime
+    );
+
+    const percent =
+        (audio.currentTime / audio.duration) * 100;
+
+    progressFill.style.width =
+        percent + "%";
+
+    currentTimeEl.innerText =
+        formatTime(audio.currentTime);
+
+    totalTimeEl.innerText =
+        formatTime(audio.duration);
+});
+
+// SEEK
+
+progressBar.addEventListener("click", (e) => {
+
+    const rect =
+        progressBar.getBoundingClientRect();
+
+    const percent =
+        (e.clientX - rect.left) / rect.width;
+
+    audio.currentTime =
+        percent * audio.duration;
+});
+
+// LOAD SONG
+
+function loadSong(song){
+
+    if(!song || !song.filePath){
+
+        return;
+    }
+
+    const path =
+        song.filePath.startsWith("/")
+        ? song.filePath
+        : "/" + song.filePath;
+
+    audio.src = path;
+
+    audio.load();
+
+    audio.play()
+
+    .then(() => {
+
+        playerTitle.innerText =
+            song.title || "";
+
+        playerArtist.innerText =
+            song.artist || "";
+
+        playerImage.src =
+            song.imagePath || "";
+
+        localStorage.setItem(
+            "currentSong",
+            audio.src
+        );
+
+        localStorage.setItem(
+            "currentSongId",
+            song.songId
+        );
+
+        localStorage.setItem(
+            "currentTitle",
+            song.title || ""
+        );
+
+        localStorage.setItem(
+            "currentArtist",
+            song.artist || ""
+        );
+
+        localStorage.setItem(
+            "currentImage",
+            song.imagePath || ""
+        );
+
+        localStorage.setItem(
+            "currentTime",
+            "0"
+        );
+
+        localStorage.setItem(
+            "isPlaying",
+            "true"
+        );
+
+        fetch(
+            "/usr/song/incrementRepeat?songId="
+            + song.songId,
+            {
+                method:"POST"
+            }
+        );
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
     });
+}
 
-    // ─── REPEAT ──────────────────────────────────────────────────────────────
-    repeatBtn.addEventListener("click", () => {
-        isRepeat = !isRepeat;
-        repeatBtn.classList.toggle("active", isRepeat);
-        audio.loop = isRepeat;
+// NEXT SONG
+
+nextBtn.addEventListener("click", () => {
+
+    fetch(
+        `/api/songs/next${isShuffle ? "?shuffle=true" : ""}`
+    )
+
+    .then(res => res.json())
+
+    .then(song => {
+
+        loadSong(song);
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
     });
+});
 
-    // ─── FAVOURITE ───────────────────────────────────────────────────────────
-    favoriteBtn.addEventListener("click", () => {
-        isLiked = !isLiked;
-        favoriteBtn.classList.toggle("fa-solid",  isLiked);
-        favoriteBtn.classList.toggle("fa-regular", !isLiked);
-        favoriteBtn.classList.toggle("liked", isLiked);
+// PREVIOUS SONG
 
-      
+prevBtn.addEventListener("click", () => {
+
+    if(audio.currentTime > 3){
+
+        audio.currentTime = 0;
+
+        return;
+    }
+
+    fetch("/api/songs/previous")
+
+    .then(res => res.json())
+
+    .then(song => {
+
+        loadSong(song);
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
     });
-	
-	function toggleFavourite(button) {
+});
 
-	    const songId =
-	            button.getAttribute("data-songid");
+// AUTO NEXT
 
-				fetch("/playlist/toggleFavourite/" + songId, {
-				    method: "POST"
-				})
-	    .then(response => response.text())
+audio.addEventListener("ended", () => {
 
-	    .then(data => {
+    if(isRepeat){
 
-	        const icon = button.querySelector("i");
+        audio.currentTime = 0;
 
-	        // SONG ADDED
-	        if(data === "ADDED") {
+        audio.play();
 
-	            icon.classList.remove("fa-regular");
+        return;
+    }
 
-	            icon.classList.add("fa-solid");
-	        }
+    nextBtn.click();
+});
 
-	        // SONG REMOVED
-	        else if(data === "REMOVED") {
+// SHUFFLE
 
-	            icon.classList.remove("fa-solid");
+shuffleBtn.addEventListener("click", () => {
 
-	            icon.classList.add("fa-regular");
-	        }
+    isShuffle = !isShuffle;
 
-	    })
+    shuffleBtn.classList.toggle(
+        "active",
+        isShuffle
+    );
+});
 
-	    .catch(error => {
+// REPEAT
 
-	        console.error(error);
+repeatBtn.addEventListener("click", () => {
 
-	    });
-	}
+    isRepeat = !isRepeat;
+
+    repeatBtn.classList.toggle(
+        "active",
+        isRepeat
+    );
+
+    audio.loop = isRepeat;
+});
+
+// TOGGLE FAVOURITE
+
+function toggleFavourite(button){
+
+    const songId =
+        button.getAttribute("data-songid");
+
+    fetch(
+        "/playlist/toggleFavourite/" + songId,
+        {
+            method:"POST"
+        }
+    )
+
+    .then(response => response.text())
+
+    .then(data => {
+
+        const icon =
+            button.querySelector("i");
+
+        if(data === "ADDED"){
+
+            icon.classList.remove("fa-regular");
+
+            icon.classList.add("fa-solid");
+        }
+
+        else if(data === "REMOVED"){
+
+            icon.classList.remove("fa-solid");
+
+            icon.classList.add("fa-regular");
+        }
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+    });
+}
+
 </script>
 
 </body>

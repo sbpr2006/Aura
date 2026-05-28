@@ -115,13 +115,6 @@
             margin:auto;
         }
 
-        .profile-avatar{
-            width:140px;
-            height:140px;
-            border-radius:50%;
-            border:4px solid #8b5cf6;
-            object-fit:cover;
-        }
 
         .upload-btn{
 
@@ -293,7 +286,52 @@
 		        transform:rotate(360deg);
 		    }
 		}
+		
+		.profile-btn{
 
+					width:140px;
+		            height:140px;
+		            border-radius:50%;
+		            border:4px solid #8b5cf6;
+		            object-fit:fill;
+
+					    background:linear-gradient(
+					        135deg,
+					        #8b5cf6,
+					        #06b6d4
+					    );
+
+					    color:white;
+
+					    display:flex;
+
+					    align-items:center;
+
+					    justify-content:center;
+
+					    font-size:80px;
+
+					    font-weight:700;
+
+					    text-transform:uppercase;
+
+					    cursor:pointer;
+
+					    user-select:none;
+
+					    transition:0.3s ease;
+
+					    box-shadow:
+					        0 0 10px rgba(139,92,246,0.4);
+					}
+
+					.profile-btn:hover{
+
+					    transform:scale(1.08);
+
+					    box-shadow:
+					        0 0 18px rgba(6,182,212,0.6);
+					}
     </style>
 </head>
 
@@ -364,12 +402,9 @@
 
             <div class="avatar-wrapper">
 
-                <img src="https://i.pravatar.cc/300"
-                     class="profile-avatar">
-
-                <div class="upload-btn">
-                    <i class="fa-solid fa-camera"></i>
-                </div>
+				<div class="profile-btn"
+				             th:text="${#strings.substring(session.username,0,1).toUpperCase()}">U
+				</div>
 
             </div>
 
@@ -776,7 +811,7 @@
 	    <i class="fa-solid fa-right-from-bracket"></i>
 
 	</a>
-
+<script src="/player.js"></script>
 <!-- Bootstrap JS -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,5 +1,6 @@
 package com.beats.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import com.beats.repository.MusicRepository;
 import com.beats.repository.PlaylistRepository;
 import com.beats.repository.PlaylistSongsRepository;
 import com.beats.repository.SongRepository;
+import com.beats.services.PlayerService;
 import com.beats.services.PlaylistService;
 import com.beats.services.SongServices;
 import com.beats.services.UserService;
@@ -44,6 +46,8 @@ public class MusicController {
 	PlaylistRepository playlistRepo;
 	@Autowired
 	UserService userService;
+	@Autowired
+    private PlayerService playerService;
 	
 	@GetMapping("/register")
 	public String register() {
@@ -101,6 +105,8 @@ public class MusicController {
     
     @GetMapping("/home")
     public String homePage(Model model, HttpSession session) {
+    	 Users user = (Users) session.getAttribute("loggedUser");
+         if(user == null) { return "redirect:/usr/loginPage";}
     	List<Songs> songs =songServices.getTrendingSongs();
     	List<Playlists> playlists=playlistService.getTrendingPlaylists();
         model.addAttribute("songs",songs );
@@ -191,7 +197,7 @@ public class MusicController {
     }
   
     @GetMapping("/playlists") 
-    public String playlistPage(Model model, HttpSession session) {
+    public String libraryPage(Model model, HttpSession session) {
             Users user = (Users) session.getAttribute("loggedUser");
             if (user == null) return "redirect:/usr/loginPage";
 
@@ -267,6 +273,8 @@ public class MusicController {
         // GET SONGS
 
         List<Songs> songs =songServices.getSongsbyPlalistId(playlistId);
+        
+        playerService.setQueue(songs);
 
 
         model.addAttribute("playlist", myPlaylist);
@@ -307,13 +315,61 @@ public class MusicController {
         song.setRepeatedCount(current + 1);
         songRepo.save(song);
     }
+    @PostMapping("/playlist/updatePlayedCount")
     @ResponseBody
     public void updatePlayedCount(){
     	playlistService.refreshAllPlaylistCounts();
     }
     
     
-    
     @GetMapping("/search")
-    public String search() { return "search.html"; }
+    public String searchPage( HttpSession session) {
+    	 Users user = (Users) session.getAttribute("loggedUser");
+         // check if user logged in
+         if(user == null) { return "redirect:/usr/loginPage";}
+
+        return "search";
+    }
+
+    @GetMapping("/searchSongs")
+    @ResponseBody
+    public List<Songs> searchSongs(
+            @RequestParam String query) {
+
+        return songServices.searchSongs(query);
+    }
+    
+    @PostMapping("/addRecentSearch")
+    @ResponseBody
+    public String addRecentSearch(
+            @RequestParam String query,
+            HttpSession session) {
+
+        List<String> recentSearches =
+                (List<String>) session.getAttribute("recentSearches");
+
+        if(recentSearches == null){
+
+            recentSearches = new ArrayList<>();
+        }
+
+        
+        recentSearches.remove(query);
+
+        
+        recentSearches.add(0, query);
+
+        
+        if(recentSearches.size() > 10){
+
+            recentSearches.remove(10);
+        }
+
+        session.setAttribute(
+                "recentSearches",
+                recentSearches
+        );
+
+        return "ADDED";
+    }
 }

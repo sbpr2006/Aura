@@ -540,7 +540,11 @@ function slideRight(id){
 
     const playPauseBtn = document.getElementById("playPauseBtn");
 
-    window.globalAudioPlayer = window.globalAudioPlayer || new Audio();
+	window.globalAudioPlayer =
+	    window.globalAudioPlayer || new Audio();
+
+	const globalAudioPlayer =
+	    window.globalAudioPlayer;
 
     let currentSongIndex = 0;
     let songs = [];

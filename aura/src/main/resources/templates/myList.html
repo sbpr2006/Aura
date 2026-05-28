@@ -118,13 +118,17 @@
             transition:0.3s;
 
             border:1px solid transparent;
-        }
+       
+		    cursor:pointer;
 
-        .song-card:hover{
+		    transition:0.3s ease;
+		}
 
-            transform:translateY(-4px);
+		.song-card:hover{
 
-            background:#232323;
+		    transform:scale(1.02);
+
+		    background:#1f1f1f;
 
             border:1px solid rgba(157,107,255,0.3);
         }
@@ -295,13 +299,15 @@
 
 		    <!-- PLAY ALL BUTTON -->
 
-		    <button class="btn btn-lg btn-light px-4 fw-bold"
-		            onclick="playAllSongs()">
+			<button class="btn btn-light"
+			        th:attr="data-playlistid=${playlist.playlistId}"
+			        onclick="playAllSongs(this)">
 
-		        <i class="fa-solid fa-play me-2"></i>
-		        Play All
+			    <i class="fa-solid fa-play"></i>
 
-		    </button>
+			    Play All
+
+			</button>
 
 		    <!-- ADD SONG BUTTON -->
 
@@ -326,10 +332,18 @@
 	    No Songs In Playlist
 
 	</div>
-
 	<div th:each="ps : ${playlistSongs}"
 
-	     class="song-card animate__animated animate__fadeInUp">
+	     class="song-card animate__animated animate__fadeInUp"
+
+	     th:attr="
+	     data-title=${ps.title},
+	     data-artist=${ps.artist},
+	     data-image=${ps.imagePath},
+	     data-audio=${ps.filePath},
+	     data-songid=${ps.songId}"
+
+	     onclick="playSong(this)">
 
 	    <!-- SONG INFO -->
 
@@ -363,18 +377,11 @@
 
 	    <div class="song-actions">
 
-	        <!-- PLAY SONG -->
+	        <!-- PLAY ICON -->
 
-	        <button class="btn btn-sm text-light play-btn"
+	        <button class="btn btn-sm text-light"
 
-	                th:attr="
-	                data-title=${ps.title},
-	                data-artist=${ps.artist},
-	                data-image=${ps.imagePath},
-	                data-audio=${ps.filePath},
-					data-songid=${ps.songId}"
-
-	                onclick="playSong(this)">
+	                onclick="event.stopPropagation(); playSong(this.parentElement.parentElement)">
 
 	            <i class="fa-solid fa-circle-play"></i>
 
@@ -382,27 +389,30 @@
 
 	        <!-- REMOVE SONG -->
 
-			<form th:action="@{/playlist/removeSong}"
-			      method="post">
+	        <form th:action="@{/playlist/removeSong}"
+	              method="post"
 
-			    <input type="hidden"
-			           name="songId"
-			           th:value="${ps.songId}">
+	              onclick="event.stopPropagation()">
 
-			    <input type="hidden"
-			           name="playlistId"
-			           th:value="${playlist.playlistId}">
+	            <input type="hidden"
+	                   name="songId"
+	                   th:value="${ps.songId}">
 
-			    <button type="submit"
-			            class="btn btn-sm text-danger">
+	            <input type="hidden"
+	                   name="playlistId"
+	                   th:value="${playlist.playlistId}">
 
-			        <i class="fa-solid fa-trash"></i>
+	            <button type="submit"
+	                    class="btn btn-sm text-danger">
 
-			    </button>
+	                <i class="fa-solid fa-trash"></i>
 
-			</form>
+	            </button>
+
+	        </form>
 
 	    </div>
+
 	</div>
 	<!-- ADD SONG MODAL -->
 
@@ -504,19 +514,43 @@
 
 	    /* PLAY ALL SONGS */
 
-	    function playAllSongs(){
+		function playAllSongs(button){
 
-	        const songs = document.querySelectorAll(".play-btn");
+		    const playlistId =
 
-	        if(songs.length > 0){
+		        button.getAttribute(
+		            "data-playlistid"
+		        );
 
-	            songs[0].click();
+		    // LOAD SESSION QUEUE
 
-	        }
-	    }
+		    fetch(
+		        "/api/queue/loadPlaylist?playlistId="
+		        + playlistId,
+		        {
+		            method:"POST"
+		        }
+		    )
+
+		    .then(() => {
+
+		        // PLAY FIRST SONG
+
+		        const songs =
+
+		            document.querySelectorAll(
+		                ".play-btn"
+		            );
+
+		        if(songs.length > 0){
+
+		            songs[0].click();
+		        }
+		    });
+		}
 
 	</script>
-<script src="/player.js"></script>
+
 <div th:replace="player.html"></div>
 
 

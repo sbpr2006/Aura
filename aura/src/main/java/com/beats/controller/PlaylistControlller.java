@@ -1,9 +1,12 @@
 package com.beats.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -281,5 +284,35 @@ public class PlaylistControlller {
 
         songServices.increaseSongCount(songId);
 
+    }
+    
+    @GetMapping("/playall/{id}")
+    public String openPlaylist(
+            @PathVariable Long id,
+            Model model,
+            HttpSession session){
+
+        List<Songs> songs =
+                songServices
+                .getSongsbyPlalistId(id);
+
+        // STORE IN SESSION
+
+        session.setAttribute(
+                "queue",
+                songs
+        );
+
+        session.setAttribute(
+                "currentIndex",
+                0
+        );
+
+        model.addAttribute(
+                "songs",
+                songs
+        );
+
+        return "myPlaylist";
     }
 }

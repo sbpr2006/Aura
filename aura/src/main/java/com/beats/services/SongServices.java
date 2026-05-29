@@ -118,10 +118,13 @@ public class SongServices {
 	}
 
 	public List<Songs> searchSongs(String query) {
-		 return songRepo
-		            .findByTitleContainingIgnoreCaseOrAlbumContainingIgnoreCase(
+		 return songRepo.findByTitleContainingIgnoreCaseOrAlbumContainingIgnoreCase(
 		                    query,
 		                    query
 		            );
 		}
+
+	public List<Songs> getAllSongs() {
+		return songRepo.findAll();
+	}
 }

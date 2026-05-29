@@ -2,13 +2,20 @@ package com.beats.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.beats.model.Songs;
+import com.beats.repository.SongRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class PlayerService {
+	@Autowired
+	SongRepository songRepo;
 
     private List<Songs> queue =
             new ArrayList<>();
@@ -67,4 +74,5 @@ public class PlayerService {
 
         return queue.get(currentIndex);
     }
+
 }

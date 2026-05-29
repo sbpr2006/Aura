@@ -311,14 +311,13 @@
 
 		    <!-- ADD SONG BUTTON -->
 
-		    <button class="btn btn-lg btn-outline-light px-4 fw-bold"
-		            data-bs-toggle="modal"
-		            data-bs-target="#addSongModal">
-
-		        <i class="fa-solid fa-plus me-2"></i>
-		        Add Song
-
-		    </button>
+			<button th:if="${isOwner}"
+			            class="btn btn-lg btn-outline-light px-4 fw-bold"
+			            data-bs-toggle="modal"
+			            data-bs-target="#addSongModal">
+			        <i class="fa-solid fa-plus me-2"></i>
+			        Add Song
+			    </button>
 
 		</div>
 
@@ -387,36 +386,28 @@
 
 	        </button>
 
-	        <!-- REMOVE SONG -->
+			<!-- REMOVE SONG — owner only -->
+			<form th:if="${isOwner}"
+			      th:action="@{/playlist/removeSong}"
+			      method="post"
+			      onclick="event.stopPropagation()">
 
-	        <form th:action="@{/playlist/removeSong}"
-	              method="post"
+			    <input type="hidden" name="songId" th:value="${ps.songId}">
+			    <input type="hidden" name="playlistId" th:value="${playlist.playlistId}">
 
-	              onclick="event.stopPropagation()">
+			    <button type="submit" class="btn btn-sm text-danger">
+			        <i class="fa-solid fa-trash"></i>
+			    </button>
 
-	            <input type="hidden"
-	                   name="songId"
-	                   th:value="${ps.songId}">
-
-	            <input type="hidden"
-	                   name="playlistId"
-	                   th:value="${playlist.playlistId}">
-
-	            <button type="submit"
-	                    class="btn btn-sm text-danger">
-
-	                <i class="fa-solid fa-trash"></i>
-
-	            </button>
-
-	        </form>
+			</form>
 
 	    </div>
 
 	</div>
 	<!-- ADD SONG MODAL -->
 
-	<div class="modal fade"
+	<div th:if="${isOwner}"
+	     class="modal fade"
 	     id="addSongModal"
 	     tabindex="-1">
 

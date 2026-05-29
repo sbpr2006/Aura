@@ -252,37 +252,32 @@ public class MusicController {
         return "myList";
     }
     
-    @GetMapping("/myplaylist/{playlistId}")
-    public String openPlaylist(@PathVariable long playlistId,
-            HttpSession session,
-            Model model) {
-        Users user = (Users) session.getAttribute("loggedUser");
-        if(user == null)return "redirect:/usr/loginPage";
-
-
-        // FIND FAVOURITE PLAYLIST
-        Playlists myPlaylist =
-                playlistService.findByUserIdAndPlaylistId(user.getUserId(),playlistId);
-
-        // CREATE IF NOT EXISTS
-
-        if(myPlaylist == null) {
-
-        }
-
-        // GET SONGS
-
-        List<Songs> songs =songServices.getSongsbyPlalistId(playlistId);
-        
-        playerService.setQueue(songs);
-
-
-        model.addAttribute("playlist", myPlaylist);
-
-        model.addAttribute("playlistSongs", songs);
-
-        return "myList";
-    }
+   @GetMapping("/myplaylist/{playlistId}")
+	public String openPlaylist(@PathVariable long playlistId,
+	        HttpSession session,
+	        Model model) {
+	
+	    Users user = (Users) session.getAttribute("loggedUser");
+	    if(user == null) return "redirect:/usr/loginPage";
+	
+	    // FIND PLAYLIST BY ID (anyone can view)
+	    Playlists myPlaylist = playlistService.getPlaylistById(playlistId);
+	
+	    if(myPlaylist == null) return "redirect:/usr/playlists";
+	
+	    // CHECK OWNERSHIP
+	    boolean isOwner = myPlaylist.getUser() != null &&
+	        myPlaylist.getUser().getUserId() == user.getUserId();
+	
+	    // GET SONGS
+	    List<Songs> songs = songServices.getSongsbyPlalistId(playlistId);
+	
+	    model.addAttribute("playlist", myPlaylist);
+	    model.addAttribute("isOwner", isOwner);
+	    model.addAttribute("playlistSongs", songs);
+	
+	    return "myList";
+	}
     
     @GetMapping("/nowPlaying")
     public String nowPlayingPage(

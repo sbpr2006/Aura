@@ -1,4 +1,19 @@
 // ======================================================
+// GLOBAL FLAGS
+// ======================================================
+
+window.isShuffle = false;
+window.isRepeat = false;
+
+// RESTORE SAVED FLAGS
+
+const savedShuffle = localStorage.getItem("isShuffle");
+const savedRepeat = localStorage.getItem("isRepeat");
+
+if(savedShuffle === "true")window.isShuffle = true;
+if(savedRepeat === "true")window.isRepeat = true;
+
+// ======================================================
 // GLOBAL AUDIO PLAYER
 // ======================================================
 	
@@ -11,7 +26,7 @@ if (!window.globalAudioPlayer) {
 
 const globalAudioPlayer =
     window.globalAudioPlayer;
-
+	
 // ======================================================
 // RESTORE PLAYER STATE
 // ======================================================
@@ -279,11 +294,11 @@ function playSong(button){
 
 function loadSong(song){
 
-    if(!song){
+	if(!song || !song.filePath){
 
-        return;
-    }
-
+	       console.error("loadSong: invalid song", song);
+	       return;
+	   }
     // UPDATE UI
 
     updatePlayerUI(song);
@@ -327,6 +342,10 @@ function loadSong(song){
             method:"POST"
         }
     );
+	
+	fetch("/api/queue/get")
+	.then(r => r.json())
+	.then(data => console.log(data));
 }
 
 // ======================================================
@@ -334,23 +353,44 @@ function loadSong(song){
 // ======================================================
 
 function nextSong(){
+	
+	const currentSongId =
+	        localStorage.getItem(
+	            "currentSongId"
+	        );
 
-    fetch("/api/songs/next")
+	// ADD CURRENT SONG TO PREVIOUS QUEUE (fire and forget)
 
-    .then(response => response.json())
+	    if(currentSongId){
+	        fetch("/api/queue/add?songId=" + currentSongId, { method:"POST" })
+	        .catch(error => console.error(error));
+	    }
 
-    .then(song => {
+	    // INCREMENT POINTER THEN FETCH NEXT
 
-        loadSong(song);
+		fetch("/api/songs/next" + (window.isShuffle ? "?shuffle=true" : ""))
+		    .then(response => {
+		        if(!response.ok) throw new Error("HTTP " + response.status);
+		        return response.text();
+		    })
+		    .then(data => {
+		        if(!data || data.trim() === "" || data.trim() === "null"){
+		            throw new Error("Empty response");
+		        }
 
-    })
-
-    .catch(error => {
-
-        console.error(error);
-
-    });
+	        const song = JSON.parse(data);
+	        if(song) loadSong(song);
+	    })
+	    .catch(error => {
+	        console.error(error);
+	        fetch("/api/songs/random")
+	        .then(res => res.json())
+	        .then(song => { if(song) loadSong(song); });
+	    });
+		//fetch("/api/queue/get").then(r=>r.json()).then(q=>console.log(q))
 }
+
+
 
 // ======================================================
 // PREVIOUS SONG
@@ -415,33 +455,83 @@ function togglePlay(){
 function playAllSongs(button){
 
     const playlistId =
+        button.getAttribute("data-playlistid");
 
-        button.getAttribute(
-            "data-playlistid"
-        );
-
+    // LOAD PLAYLIST INTO QUEUE
     fetch(
-        "/api/queue/loadPlaylist?playlistId="
-        + playlistId,
-        {
-            method:"POST"
-        }
+        "/api/queue/loadPlaylist?playlistId=" + playlistId,
+        { method:"POST" }
     )
-
     .then(() => {
 
-        const songs =
+        // FETCH FIRST SONG FROM QUEUE
+        return fetch("/api/songs/next");
+    })
+    .then(response => response.json())
+    .then(song => {
 
-            document.querySelectorAll(
-                ".play-btn"
-            );
-
-        if(songs.length > 0){
-
-            playSong(songs[0]);
+        if(song){
+            loadSong(song);
         }
-    });
-	fetch("/api/queue/add?songId=" + songId,{
-	    method:"POST"
-	});
+    })
+    .catch(error => console.error(error));
+}
+
+// ======================================================
+// TOGGLE SHUFFLE
+// ======================================================
+
+function toggleShuffle(){
+
+    window.isShuffle =
+        !window.isShuffle;
+
+    localStorage.setItem(
+        "isShuffle",
+        window.isShuffle
+    );
+
+    const shuffleBtn =
+        document.getElementById(
+            "shuffleBtn"
+        );
+
+    if(shuffleBtn){
+
+        shuffleBtn.classList.toggle(
+            "active",
+            window.isShuffle
+        );
+    }
+}
+
+// ======================================================
+// TOGGLE REPEAT
+// ======================================================
+
+function toggleRepeat(){
+
+    window.isRepeat =
+        !window.isRepeat;
+
+    localStorage.setItem(
+        "isRepeat",
+        window.isRepeat
+    );
+
+    globalAudioPlayer.loop =
+        window.isRepeat;
+
+    const repeatBtn =
+        document.getElementById(
+            "repeatBtn"
+        );
+
+    if(repeatBtn){
+
+        repeatBtn.classList.toggle(
+            "active",
+            window.isRepeat
+        );
+    }
 }

@@ -2,8 +2,10 @@ package com.beats.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,36 +33,65 @@ public class PlayerController {
 
     @GetMapping("/songs/next")
     @ResponseBody
-    public Songs nextSong(
+    public ResponseEntity<Songs> nextSong(
+            @RequestParam(required=false) Boolean shuffle,
             HttpSession session){
 
         List<Songs> queue =
-
-                (List<Songs>)
-                session.getAttribute("queue");
+                (List<Songs>) session.getAttribute("queue");
 
         Integer currentIndex =
-
-                (Integer)
-                session.getAttribute("currentIndex");
+                (Integer) session.getAttribute("currentIndex");
 
         if(queue == null || queue.isEmpty()){
-
-            return null;
+            return ResponseEntity.ok(null);
         }
 
-        currentIndex =
-                (currentIndex + 1)
-                % queue.size();
+        if(currentIndex == null){
+            currentIndex = 0;
+        }
 
-        session.setAttribute(
-                "currentIndex",
-                currentIndex
-        );
+        if(Boolean.TRUE.equals(shuffle)){
+            // RANDOM INDEX EXCLUDING CURRENT
+            int newIndex;
+            do {
+                newIndex = new java.util.Random().nextInt(queue.size());
+            } while(queue.size() > 1 && newIndex == currentIndex);
 
-        return queue.get(currentIndex);
+            currentIndex = newIndex;
+
+        } else {
+
+            int nextIndex = currentIndex + 1;
+
+            // END OF QUEUE — pick random song
+            if(nextIndex >= queue.size()){
+
+                Songs randomSong = songServices.getAllSongs()
+                    .stream()
+                    .skip((long)(new java.util.Random().nextInt(
+                        (int) songServices.getAllSongs().size()
+                    )))
+                    .findFirst()
+                    .orElse(null);
+
+                if(randomSong != null){
+                    queue.add(randomSong);
+                    session.setAttribute("queue", queue);
+                }
+
+                currentIndex = queue.size() - 1;
+
+            } else {
+                currentIndex = nextIndex;
+            }
+        }
+
+        session.setAttribute("currentIndex", currentIndex);
+
+        return ResponseEntity.ok(queue.get(currentIndex));
     }
-
+    
     @GetMapping("/songs/previous")
     @ResponseBody
     public Songs previousSong(
@@ -116,19 +147,10 @@ public class PlayerController {
             HttpSession session){
 
         List<Songs> songs =
+                songServices.getSongsbyPlalistId(playlistId);
 
-                songServices
-                .getSongsbyPlalistId(playlistId);
-
-        session.setAttribute(
-                "queue",
-                songs
-        );
-
-        session.setAttribute(
-                "currentIndex",
-                0
-        );
+        session.setAttribute("queue", songs);
+        session.setAttribute("currentIndex", -1);
     }
     
     @PostMapping("/queue/add")
@@ -148,17 +170,71 @@ public class PlayerController {
 
         // AVOID DUPLICATE
 
-        if(!queue.contains(song)){
+        boolean alreadyExists = queue.stream()
+        	    .anyMatch(s -> s.getSongId().equals(song.getSongId()));
 
-            queue.add(song);
+        	if(!alreadyExists){
+        	    queue.add(song);
+        	}
+
+        	session.setAttribute("queue", queue);
+    }
+    
+    @GetMapping("/songs/random")
+    @ResponseBody
+    public Songs getRandomSong(HttpSession session){
+
+        List<Songs> allSongs = songServices.getAllSongs(); // use all songs
+
+        if(allSongs == null || allSongs.isEmpty()){
+            return null;
         }
 
-        session.setAttribute("queue", queue);
+        // EXCLUDE CURRENT SONG TO AVOID REPEAT
+        String currentSongId = (String) session.getAttribute("currentSongId");
+
+        List<Songs> filtered = allSongs.stream()
+            .filter(s -> !String.valueOf(s.getSongId()).equals(currentSongId))
+            .collect(java.util.stream.Collectors.toList());
+
+        if(filtered.isEmpty()) filtered = allSongs;
+
+        Songs picked = filtered.get(new Random().nextInt(filtered.size()));
+        session.setAttribute("currentSongId", String.valueOf(picked.getSongId()));
+        return picked;
+    }
+    
+    @PostMapping("/songs/incrementPointer")
+    @ResponseBody
+    public void incrementPointer(
+            HttpSession session){
+
+        Integer currentIndex =
+                (Integer) session.getAttribute(
+                        "currentIndex"
+                );
+
+        if(currentIndex == null){
+
+            currentIndex = 0;
+        }
+
+        currentIndex++;
 
         session.setAttribute(
                 "currentIndex",
-                queue.indexOf(songId)
+                currentIndex
         );
+    }
+    
+    @GetMapping("/queue/get")
+    @ResponseBody
+    public List<Songs> getQueue(HttpSession session){
+
+        List<Songs> queue =
+            (List<Songs>) session.getAttribute("queue");
+
+        return queue != null ? queue : new ArrayList<>();
     }
     
 }

@@ -334,11 +334,37 @@
             transform:scale(1.05);
         }
 
-        .shuffle,
-        .repeat{
+		/* SHUFFLE ACTIVE */
 
-            color:#3fe3ff !important;
-        }
+		#shuffleBtn.active,
+		#repeatBtn.active{
+
+		    color:#a855f7;
+
+		    background:rgba(168,85,247,0.18);
+
+		    border-radius:50%;
+
+		    box-shadow:
+		        0 0 10px rgba(168,85,247,0.5),
+		        0 0 20px rgba(168,85,247,0.2);
+
+		    transform:scale(1.15);
+
+		    padding:10px;
+		}
+
+		#shuffleBtn.active i,
+		#repeatBtn.active i{
+
+		    filter:drop-shadow(0 0 4px rgba(168,85,247,0.9));
+		}
+
+		#shuffleBtn,
+		#repeatBtn{
+
+		    transition:0.3s ease;
+		}
 
         /* BOTTOM NAVIGATION */
 
@@ -658,9 +684,15 @@
 
     <div class="controls">
 
-        <i class="fa-solid fa-shuffle"
+		<!-- SHUFFLE -->
 
-           id="shuffleBtn"></i>
+		<button class="btn btn-sm text-light"
+
+		        id="shuffleBtn">
+
+		    <i class="fa-solid fa-shuffle"></i>
+
+		</button>
 
         <i class="fa-solid fa-backward-step"
 
@@ -680,9 +712,15 @@
 
            id="nextBtn"></i>
 
-        <i class="fa-solid fa-repeat"
+		   <!-- REPEAT -->
 
-           id="repeatBtn"></i>
+		   <button class="btn btn-sm text-light"
+
+		           id="repeatBtn">
+
+		       <i class="fa-solid fa-repeat"></i>
+
+		   </button>
 
     </div>
 
@@ -718,23 +756,21 @@
     </a>
 
 </div>
-
-<!-- BOOTSTRAP -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="/player.js"></script>
 <script>
 
 const audio =
-    window.globalAudioPlayer || new Audio();
-
-window.globalAudioPlayer = audio;
+    window.globalAudioPlayer;
 
 // FLAGS
 
-let isShuffle = false;
+// FLAGS
 
-let isRepeat = false;
+var isShuffle =
+    localStorage.getItem("isShuffle") == "true";
+
+var isRepeat =
+    localStorage.getItem("isRepeat") == "true";
 
 // ELEMENTS
 
@@ -743,12 +779,6 @@ const playBtn =
 
 const playIcon =
     document.getElementById("playIcon");
-
-const playerTitle =
-    document.getElementById("playerTitle");
-
-const playerArtist =
-    document.getElementById("playerArtist");
 
 const playerImage =
     document.getElementById("playerImage");
@@ -817,91 +847,35 @@ function updatePlayIcon(){
     }
 }
 
-// LOAD SAVED SONG
+// RESTORE BUTTON STATES
 
 window.addEventListener("load", () => {
 
-    const savedSong =
-        localStorage.getItem("currentSong");
+    if(window.isShuffle){
 
-    const savedTitle =
-        localStorage.getItem("currentTitle");
-
-    const savedArtist =
-        localStorage.getItem("currentArtist");
-
-    const savedImage =
-        localStorage.getItem("currentImage");
-
-    const savedTime =
-        parseFloat(
-            localStorage.getItem("currentTime")
-        ) || 0;
-
-    const isPlaying =
-        localStorage.getItem("isPlaying");
-
-    if(savedSong){
-
-        audio.src = savedSong;
-
-        audio.currentTime = savedTime;
+        shuffleBtn.classList.add("active");
     }
 
-    if(savedTitle){
+    if(window.isRepeat){
 
-        playerTitle.innerText =
-            savedTitle;
-    }
+        repeatBtn.classList.add("active");
 
-    if(savedArtist){
-
-        playerArtist.innerText =
-            savedArtist;
-    }
-
-    if(savedImage){
-
-        playerImage.src =
-            savedImage;
-    }
-
-    if(isPlaying === "true"){
-
-        audio.play()
-        .catch(error => {
-
-            console.log(error);
-
-        });
+        audio.loop = true;
     }
 
     updatePlayIcon();
 });
 
-// PLAY / PAUSE
+// PLAY BUTTON
 
 playBtn.addEventListener("click", () => {
 
-    if(audio.paused){
-
-        audio.play();
-    }
-
-    else{
-
-        audio.pause();
-    }
+    togglePlay();
 });
 
 // PLAY EVENT
 
 audio.addEventListener("play", () => {
-
-    localStorage.setItem(
-        "isPlaying",
-        "true"
-    );
 
     updatePlayIcon();
 });
@@ -910,22 +884,12 @@ audio.addEventListener("play", () => {
 
 audio.addEventListener("pause", () => {
 
-    localStorage.setItem(
-        "isPlaying",
-        "false"
-    );
-
     updatePlayIcon();
 });
 
 // TIME UPDATE
 
 audio.addEventListener("timeupdate", () => {
-
-    localStorage.setItem(
-        "currentTime",
-        audio.currentTime
-    );
 
     const percent =
         (audio.currentTime / audio.duration) * 100;
@@ -940,7 +904,7 @@ audio.addEventListener("timeupdate", () => {
         formatTime(audio.duration);
 });
 
-// SEEK
+// SEEK BAR
 
 progressBar.addEventListener("click", (e) => {
 
@@ -954,145 +918,25 @@ progressBar.addEventListener("click", (e) => {
         percent * audio.duration;
 });
 
-// LOAD SONG
-
-function loadSong(song){
-
-    if(!song || !song.filePath){
-
-        return;
-    }
-
-    const path =
-        song.filePath.startsWith("/")
-        ? song.filePath
-        : "/" + song.filePath;
-
-    audio.src = path;
-
-    audio.load();
-
-    audio.play()
-
-    .then(() => {
-
-        playerTitle.innerText =
-            song.title || "";
-
-        playerArtist.innerText =
-            song.artist || "";
-
-        playerImage.src =
-            song.imagePath || "";
-
-        localStorage.setItem(
-            "currentSong",
-            audio.src
-        );
-
-        localStorage.setItem(
-            "currentSongId",
-            song.songId
-        );
-
-        localStorage.setItem(
-            "currentTitle",
-            song.title || ""
-        );
-
-        localStorage.setItem(
-            "currentArtist",
-            song.artist || ""
-        );
-
-        localStorage.setItem(
-            "currentImage",
-            song.imagePath || ""
-        );
-
-        localStorage.setItem(
-            "currentTime",
-            "0"
-        );
-
-        localStorage.setItem(
-            "isPlaying",
-            "true"
-        );
-
-        fetch(
-            "/usr/song/incrementRepeat?songId="
-            + song.songId,
-            {
-                method:"POST"
-            }
-        );
-
-    })
-
-    .catch(error => {
-
-        console.log(error);
-
-    });
-}
-
 // NEXT SONG
 
 nextBtn.addEventListener("click", () => {
 
-    fetch(
-        `/api/songs/next${isShuffle ? "?shuffle=true" : ""}`
-    )
-
-    .then(res => res.json())
-
-    .then(song => {
-
-        loadSong(song);
-
-    })
-
-    .catch(error => {
-
-        console.log(error);
-
-    });
+    nextSong();
 });
 
 // PREVIOUS SONG
 
 prevBtn.addEventListener("click", () => {
 
-    if(audio.currentTime > 3){
-
-        audio.currentTime = 0;
-
-        return;
-    }
-
-    fetch("/api/songs/previous")
-
-    .then(res => res.json())
-
-    .then(song => {
-
-        loadSong(song);
-
-    })
-
-    .catch(error => {
-
-        console.log(error);
-
-    });
+    prevSong();
 });
 
 // AUTO NEXT
 
 audio.addEventListener("ended", () => {
 
-    if(isRepeat){
+    if(window.isRepeat){
 
         audio.currentTime = 0;
 
@@ -1101,18 +945,23 @@ audio.addEventListener("ended", () => {
         return;
     }
 
-    nextBtn.click();
+    nextSong();
 });
 
 // SHUFFLE
 
 shuffleBtn.addEventListener("click", () => {
 
-    isShuffle = !isShuffle;
-
+	window.isShuffle = isShuffle = !isShuffle;
+	
     shuffleBtn.classList.toggle(
         "active",
-        isShuffle
+        window.isShuffle
+    );
+
+    localStorage.setItem(
+        "isShuffle",
+        window.isShuffle
     );
 });
 
@@ -1120,14 +969,19 @@ shuffleBtn.addEventListener("click", () => {
 
 repeatBtn.addEventListener("click", () => {
 
-    isRepeat = !isRepeat;
+	window.isRepeat = isRepeat = !isRepeat;
 
     repeatBtn.classList.toggle(
         "active",
-        isRepeat
+        window.isRepeat
     );
 
     audio.loop = isRepeat;
+
+    localStorage.setItem(
+        "isRepeat",
+        window.isRepeat
+    );
 });
 
 // TOGGLE FAVOURITE
@@ -1174,6 +1028,11 @@ function toggleFavourite(button){
 }
 
 </script>
+<!-- BOOTSTRAP -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
 
 </body>
 </html>

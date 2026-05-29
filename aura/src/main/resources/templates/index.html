@@ -431,26 +431,15 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <h2 class="section-title mb-0">
-            Trending Playlists
-        </h2>
+        <h2 class="section-title mb-0">Trending Playlists</h2>
 
         <div class="slider-controls">
-
-            <button class="slide-btn"
-                    onclick="slideLeft('playlistRow')">
-
+            <button class="slide-btn" onclick="slideLeft('playlistRow')">
                 <i class="fa-solid fa-chevron-left"></i>
-
             </button>
-
-            <button class="slide-btn"
-                    onclick="slideRight('playlistRow')">
-
+            <button class="slide-btn" onclick="slideRight('playlistRow')">
                 <i class="fa-solid fa-chevron-right"></i>
-
             </button>
-
         </div>
 
     </div>
@@ -460,7 +449,10 @@
         <div class="music-slide-card"
              th:each="playlist : ${playlists}">
 
-            <div class="card music-card h-100 position-relative">
+            <div class="card music-card h-100 position-relative"
+                 style="cursor:pointer;"
+                 th:data-href="@{/usr/myplaylist/{id}(id=${playlist.playlistId})}"
+                 onclick="window.location.href=this.getAttribute('data-href')">
 
                 <img src="https://picsum.photos/400?2"
                      class="card-img-top"
@@ -474,32 +466,18 @@
                     </h6>
 
                     <p class="text-secondary small mb-0">
-
                         <i class="fa-solid fa-headphones"></i>
-
-                        <span th:text="${playlist.playedCount}">
-                            0
-                        </span>
-
+                        <span th:text="${playlist.playedCount}">0</span>
                         listeners
-
                     </p>
 
                 </div>
 
-                <div class="playlist-btn">
-
-                    <a th:href="@{/usr/playlist/{id}(id=${playlist.playlistId})}">
-
-						<div class="play-btn">
-
-						            <i class="fa-solid fa-play"></i>
-
-						        </div>
-
-                    </a>
-
-                </div>
+                <button class="play-btn"
+                        th:attr="data-playlistid=${playlist.playlistId}"
+                        onclick="event.stopPropagation(); playAllSongs(this)">
+                    <i class="fa-solid fa-play"></i>
+                </button>
 
             </div>
 
@@ -508,6 +486,7 @@
     </div>
 
 </div>
+<script src="/player.js"></script>
 <script>
 
 function slideLeft(id){
@@ -531,12 +510,6 @@ function slideRight(id){
         behavior:"smooth"
     });
 }
-
-</script>
-
-
-
-<script>
 
     const playPauseBtn = document.getElementById("playPauseBtn");
 
@@ -576,43 +549,7 @@ function slideRight(id){
         }
     });
 
-    // PLAY SONG
-    function playSong(button) {
-        currentSongIndex = Array.from(songs).indexOf(button);
 
-        const title  = button.getAttribute("data-title");
-        const artist = button.getAttribute("data-artist");
-        const image  = button.getAttribute("data-image");
-        const audio  = button.getAttribute("data-audio");
-        const songId = button.getAttribute("data-songid");
-
-        document.getElementById("playerTitle").innerText  = title;
-        document.getElementById("playerArtist").innerText = artist;
-        document.getElementById("playerImage").src        = image;
-
-        let cleanPath = audio.trim().replace(/^\/+/, "");
-        globalAudioPlayer.src = "/" + cleanPath;
-        globalAudioPlayer.load();
-
-        globalAudioPlayer.play()
-            .then(() => {
-                localStorage.setItem("currentSong",   globalAudioPlayer.src);
-                localStorage.setItem("currentSongId", songId || "");
-                localStorage.setItem("currentTitle",  title);
-                localStorage.setItem("currentArtist", artist);
-                localStorage.setItem("currentImage",  image);
-                localStorage.setItem("currentTime",   "0");
-                localStorage.setItem("isPlaying",     "true");
-            })
-            .catch(error => console.error("Playback error:", error));
-
-        playPauseBtn.classList.remove("fa-circle-play");
-        playPauseBtn.classList.add("fa-circle-pause");
-
-		fetch("/usr/song/incrementRepeat?songId=" + songId, {
-		    method:"POST"
-		});
-    }
 
     // PLAY / PAUSE
     function togglePlay() {
@@ -631,19 +568,7 @@ function slideRight(id){
         }
     }
 
-    // NEXT SONG
-    function nextSong() {
-        if (songs.length === 0) return;
-        currentSongIndex = (currentSongIndex + 1) % songs.length;
-        playSong(songs[currentSongIndex]);
-    }
 
-    // PREVIOUS SONG
-    function prevSong() {
-        if (songs.length === 0) return;
-        currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
-        playSong(songs[currentSongIndex]);
-    }
 
     // AUTO NEXT
     globalAudioPlayer.addEventListener("ended", nextSong);
@@ -657,7 +582,7 @@ function slideRight(id){
 <!-- PLAYER BAR -->
 <div th:replace="player.html"></div>
 
-<script src="/player.js"></script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -226,7 +226,9 @@
 
 <script>
 
+    // ======================================================
     // GLOBAL AUDIO PLAYER
+    // ======================================================
 
     if(!window.globalAudioPlayer){
 
@@ -237,7 +239,9 @@
     const audioPlayer =
         window.globalAudioPlayer;
 
-    // PAGE LOAD
+    // ======================================================
+    // RESTORE PLAYER
+    // ======================================================
 
     window.addEventListener("load", () => {
 
@@ -259,30 +263,40 @@
         const isPlaying =
             localStorage.getItem("isPlaying");
 
-        // UPDATE UI
+        // TITLE
 
-        if(savedTitle){
+        const titleEl =
+            document.getElementById("playerTitle");
 
-            document
-                .getElementById("playerTitle")
-                .innerText = savedTitle;
+        if(titleEl && savedTitle){
+
+            titleEl.innerText =
+                savedTitle;
         }
 
-        if(savedArtist){
+        // ARTIST
 
-            document
-                .getElementById("playerArtist")
-                .innerText = savedArtist;
+        const artistEl =
+            document.getElementById("playerArtist");
+
+        if(artistEl && savedArtist){
+
+            artistEl.innerText =
+                savedArtist;
         }
 
-        if(savedImage){
+        // IMAGE
 
-            document
-                .getElementById("playerImage")
-                .src = savedImage;
+        const imageEl =
+            document.getElementById("playerImage");
+
+        if(imageEl && savedImage){
+
+            imageEl.src =
+                savedImage;
         }
 
-        // LOAD AUDIO
+        // AUDIO
 
         if(savedSong){
 
@@ -290,7 +304,7 @@
                 savedSong;
         }
 
-        // RESTORE TIME
+        // TIME
 
         if(savedTime){
 
@@ -298,109 +312,85 @@
                 parseFloat(savedTime);
         }
 
-        // RESTORE PLAY STATE
+        // PLAY STATE
 
         if(isPlaying === "true"){
 
             audioPlayer.play()
-                .catch(() => {});
+            .catch(error => {
 
-            document
-                .getElementById("playPauseBtn")
-                .classList.replace(
-                    "fa-circle-play",
-                    "fa-circle-pause"
-                );
+                console.log(error);
+
+            });
         }
+
+        updatePlayPauseIcon();
     });
 
+    // ======================================================
     // PLAY / PAUSE
+    // ======================================================
 
     function togglePlay(){
+
+        if(!audioPlayer.src){
+
+            return;
+        }
+
+        if(audioPlayer.paused){
+
+            audioPlayer.play();
+
+        }else{
+
+            audioPlayer.pause();
+        }
+
+        updatePlayPauseIcon();
+    }
+
+    // ======================================================
+    // UPDATE PLAY BUTTON ICON
+    // ======================================================
+
+    function updatePlayPauseIcon(){
 
         const btn =
             document.getElementById(
                 "playPauseBtn"
             );
 
+        if(!btn){
+
+            return;
+        }
+
         if(audioPlayer.paused){
 
-            audioPlayer.play();
-
-            btn.classList.replace(
-                "fa-circle-play",
+            btn.classList.remove(
                 "fa-circle-pause"
             );
 
-            localStorage.setItem(
-                "isPlaying",
-                "true"
+            btn.classList.add(
+                "fa-circle-play"
             );
 
         }else{
 
-            audioPlayer.pause();
-
-            btn.classList.replace(
-                "fa-circle-pause",
+            btn.classList.remove(
                 "fa-circle-play"
             );
 
-            localStorage.setItem(
-                "isPlaying",
-                "false"
+            btn.classList.add(
+                "fa-circle-pause"
             );
         }
     }
-	// NEXT SONG
-	function nextSong(){
 
-	    fetch("/api/songs/next")
-
-	    .then(response => response.json())
-
-	    .then(song => {
-
-	        if(!song){
-
-	            return;
-	        }
-
-	        loadSong(song);
-	    })
-
-	    .catch(error => {
-
-	        console.error(error);
-
-	    });
-	}
-
-	// PREVIOUS SONG
-	function prevSong(){
-
-	    fetch("/api/songs/previous")
-
-	    .then(response => response.json())
-
-	    .then(song => {
-
-	        if(!song){
-
-	            return;
-	        }
-
-	        loadSong(song);
-	    })
-
-	    .catch(error => {
-
-	        console.error(error);
-
-	    });
-	}
-		
-    // SAVE CURRENT TIME
+    // ======================================================
+    // SAVE PLAYER TIME
+    // ======================================================
 
     audioPlayer.addEventListener(
         "timeupdate",
@@ -413,16 +403,61 @@
         }
     );
 
-	// OPEN NOW PLAYING PAGE
+    // ======================================================
+    // UPDATE ICON ON PLAY
+    // ======================================================
 
-	function goToNowPlaying(){
-	        const songId =
-	            localStorage.getItem("currentSongId");
+    audioPlayer.addEventListener(
+        "play",
+        () => {
 
-	        window.location.href =
-	            "/usr/nowPlaying?songId=" + (songId || "");
-	    }
+            localStorage.setItem(
+                "isPlaying",
+                "true"
+            );
+
+            updatePlayPauseIcon();
+        }
+    );
+
+    // ======================================================
+    // UPDATE ICON ON PAUSE
+    // ======================================================
+
+    audioPlayer.addEventListener(
+        "pause",
+        () => {
+
+            localStorage.setItem(
+                "isPlaying",
+                "false"
+            );
+
+            updatePlayPauseIcon();
+        }
+    );
+
+    // ======================================================
+    // GO TO NOW PLAYING
+    // ======================================================
+
+    function goToNowPlaying(){
+
+        const songId =
+            localStorage.getItem(
+                "currentSongId"
+            );
+
+        if(songId){
+
+            window.location.href =
+                "/usr/nowPlaying?songId="
+                + songId;
+        }
+    }
+
 </script>
+
 <script src="/player.js"></script>
 <!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav">

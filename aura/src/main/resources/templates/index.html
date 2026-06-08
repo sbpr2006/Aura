@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -486,104 +487,10 @@
     </div>
 
 </div>
-<script src="/player.js"></script>
-<script>
-
-function slideLeft(id){
-
-    const container =
-        document.getElementById(id);
-
-    container.scrollBy({
-        left:-500,
-        behavior:"smooth"
-    });
-}
-
-function slideRight(id){
-
-    const container =
-        document.getElementById(id);
-
-    container.scrollBy({
-        left:500,
-        behavior:"smooth"
-    });
-}
-
-    const playPauseBtn = document.getElementById("playPauseBtn");
-
-	window.globalAudioPlayer =
-	    window.globalAudioPlayer || new Audio();
-
-	const globalAudioPlayer =
-	    window.globalAudioPlayer;
-
-    let currentSongIndex = 0;
-    let songs = [];
-
-    // PAGE LOAD — single unified load handler
-    window.addEventListener("load", () => {
-
-        songs = document.querySelectorAll(".play-btn");
-
-        const savedSong   = localStorage.getItem("currentSong");
-        const savedTitle  = localStorage.getItem("currentTitle");
-        const savedArtist = localStorage.getItem("currentArtist");
-        const savedImage  = localStorage.getItem("currentImage");
-        const savedTime   = localStorage.getItem("currentTime");
-        const isPlaying   = localStorage.getItem("isPlaying");
-
-        if (savedSong) {
-            globalAudioPlayer.src = savedSong;
-            document.getElementById("playerTitle").innerText  = savedTitle  || "";
-            document.getElementById("playerArtist").innerText = savedArtist || "";
-            document.getElementById("playerImage").src        = savedImage  || "";
-            globalAudioPlayer.currentTime = parseFloat(savedTime) || 0;
-
-            if (isPlaying === "true") {
-                globalAudioPlayer.play().catch(() => {});
-                playPauseBtn.classList.remove("fa-circle-play");
-                playPauseBtn.classList.add("fa-circle-pause");
-            }
-        }
-    });
-
-
-
-    // PLAY / PAUSE
-    function togglePlay() {
-        if (!globalAudioPlayer.src) return;
-
-        if (globalAudioPlayer.paused) {
-            globalAudioPlayer.play();
-            playPauseBtn.classList.remove("fa-circle-play");
-            playPauseBtn.classList.add("fa-circle-pause");
-            localStorage.setItem("isPlaying", "true");
-        } else {
-            globalAudioPlayer.pause();
-            playPauseBtn.classList.remove("fa-circle-pause");
-            playPauseBtn.classList.add("fa-circle-play");
-            localStorage.setItem("isPlaying", "false");
-        }
-    }
-
-
-
-    // AUTO NEXT
-    globalAudioPlayer.addEventListener("ended", nextSong);
-
-    // SAVE TIME
-    globalAudioPlayer.addEventListener("timeupdate", () => {
-        localStorage.setItem("currentTime", globalAudioPlayer.currentTime);
-    });
-
-</script>
 <!-- PLAYER BAR -->
 <div th:replace="player.html"></div>
 
-
-
+<script src="/player.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+    xmlns:th="http://www.thymeleaf.org">
+
 
 <body>
 
@@ -236,15 +237,37 @@
             new Audio();
     }
 
-    const audioPlayer =
+    var audioPlayer =
         window.globalAudioPlayer;
+
+    window.isUnloading = window.isUnloading || false;
+    window.addEventListener("beforeunload", () => {
+        window.isUnloading = true;
+    });
+    window.addEventListener("pagehide", () => {
+        window.isUnloading = true;
+    });
+    window.addEventListener("pageshow", (event) => {
+        window.isUnloading = false;
+        restorePlayer();
+    });
+
+    // Preemptively set isUnloading when navigating via clicks (before the browser dispatches pause)
+    document.addEventListener("click", (e) => {
+        const target = e.target.closest("a, button, [onclick]");
+        if (target) {
+            window.isUnloading = true;
+            setTimeout(() => {
+                window.isUnloading = false;
+            }, 1000);
+        }
+    });
 
     // ======================================================
     // RESTORE PLAYER
     // ======================================================
 
-    window.addEventListener("load", () => {
-
+    function restorePlayer() {
         const savedSong =
             localStorage.getItem("currentSong");
 
@@ -264,86 +287,73 @@
             localStorage.getItem("isPlaying");
 
         // TITLE
-
         const titleEl =
             document.getElementById("playerTitle");
 
-        if(titleEl && savedTitle){
-
+        if (titleEl && savedTitle) {
             titleEl.innerText =
                 savedTitle;
         }
 
         // ARTIST
-
         const artistEl =
             document.getElementById("playerArtist");
 
-        if(artistEl && savedArtist){
-
+        if (artistEl && savedArtist) {
             artistEl.innerText =
                 savedArtist;
         }
 
         // IMAGE
-
         const imageEl =
             document.getElementById("playerImage");
 
-        if(imageEl && savedImage){
-
+        if (imageEl && savedImage) {
             imageEl.src =
                 savedImage;
         }
 
         // AUDIO
-
-        if(savedSong){
-
+        if (savedSong) {
             audioPlayer.src =
                 savedSong;
         }
 
         // TIME
-
-        if(savedTime){
-
+        if (savedTime) {
             audioPlayer.currentTime =
                 parseFloat(savedTime);
         }
 
         // PLAY STATE
-
-        if(isPlaying === "true"){
-
+        if (isPlaying === "true") {
             audioPlayer.play()
-            .catch(error => {
-
-                console.log(error);
-
-            });
+                .catch(error => {
+                    console.log(error);
+                });
         }
 
         updatePlayPauseIcon();
-    });
+    }
 
     // ======================================================
     // PLAY / PAUSE
     // ======================================================
 
     function togglePlay(){
+        // Prefer centralized toggle in /player.js when available
+        if (typeof window.togglePlay === 'function') {
+            window.togglePlay();
+            return;
+        }
 
         if(!audioPlayer.src){
-
             return;
         }
 
         if(audioPlayer.paused){
-
             audioPlayer.play();
-
-        }else{
-
+        } else {
             audioPlayer.pause();
         }
 
@@ -427,6 +437,9 @@
     audioPlayer.addEventListener(
         "pause",
         () => {
+            if (window.isUnloading) {
+                return;
+            }
 
             localStorage.setItem(
                 "isPlaying",
@@ -457,8 +470,6 @@
     }
 
 </script>
-
-<script src="/player.js"></script>
 <!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav">
     <a href="/usr/home"><i class="fa-solid fa-house"></i> Home</a>

@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: Customer-Service
+    name: aura
 
   web:
     resources:

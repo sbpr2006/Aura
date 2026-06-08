@@ -1,22 +1,52 @@
+/*
+    player.js — centralized audio player logic for Aura
+    - Handles loading, playback, queue navigation, and localStorage state
+    - Beautified: paused current audio before loading new tracks
+    - Suppresses benign AbortError from interrupted loads
+    Reviewed 2026-06-08
+*/
+
 // ======================================================
 // GLOBAL FLAGS
 // ======================================================
 
 window.isShuffle = false;
 window.isRepeat = false;
+window.isUnloading = false;
+
+window.addEventListener("beforeunload", () => {
+    window.isUnloading = true;
+});
+window.addEventListener("pagehide", () => {
+    window.isUnloading = true;
+});
+window.addEventListener("pageshow", () => {
+    window.isUnloading = false;
+});
+
+// Preemptively set isUnloading when navigating via clicks (before the browser dispatches pause)
+document.addEventListener("click", (e) => {
+    const target = e.target.closest("a, button, [onclick]");
+    if (target) {
+        window.isUnloading = true;
+        setTimeout(() => {
+            window.isUnloading = false;
+        }, 1000);
+    }
+});
 
 // RESTORE SAVED FLAGS
 
-const savedShuffle = localStorage.getItem("isShuffle");
-const savedRepeat = localStorage.getItem("isRepeat");
+var savedShuffle = localStorage.getItem("isShuffle");
+var savedRepeat = localStorage.getItem("isRepeat");
 
-if(savedShuffle === "true")window.isShuffle = true;
-if(savedRepeat === "true")window.isRepeat = true;
+if (savedShuffle === "true") window.isShuffle = true;
+if (savedRepeat === "true") window.isRepeat = true;
 
 // ======================================================
 // GLOBAL AUDIO PLAYER
 // ======================================================
-	
+
 if (!window.globalAudioPlayer) {
 
     window.globalAudioPlayer = new Audio();
@@ -24,9 +54,9 @@ if (!window.globalAudioPlayer) {
 }
 
 
-const globalAudioPlayer =
+var globalAudioPlayer =
     window.globalAudioPlayer;
-	
+
 // ======================================================
 // RESTORE PLAYER STATE
 // ======================================================
@@ -56,7 +86,7 @@ window.addEventListener("load", () => {
 
     // RESTORE AUDIO
 
-    if(savedSong){
+    if (savedSong) {
 
         globalAudioPlayer.src =
             savedSong;
@@ -80,8 +110,8 @@ window.addEventListener("load", () => {
 
     // AUTO PLAY
 
-    if(isPlaying === "true" &&
-       savedSong){
+    if (isPlaying === "true" &&
+        savedSong) {
 
         globalAudioPlayer.play()
             .catch(error => {
@@ -125,6 +155,9 @@ globalAudioPlayer.addEventListener(
 globalAudioPlayer.addEventListener(
     "pause",
     () => {
+        if (window.isUnloading) {
+            return;
+        }
 
         localStorage.setItem(
             "isPlaying",
@@ -137,7 +170,7 @@ globalAudioPlayer.addEventListener(
 // UPDATE PLAYER UI
 // ======================================================
 
-function updatePlayerUI(song){
+function updatePlayerUI(song) {
 
     const titleEl =
         document.getElementById("playerTitle");
@@ -154,26 +187,26 @@ function updatePlayerUI(song){
     const nowPlayingLink =
         document.getElementById("nowPlayingLink");
 
-    if(titleEl && song.title){
+    if (titleEl && song.title) {
 
         titleEl.innerText =
             song.title;
     }
 
-    if(artistEl && song.artist){
+    if (artistEl && song.artist) {
 
         artistEl.innerText =
             song.artist;
     }
 
-    if(imageEl && song.imagePath){
+    if (imageEl && song.imagePath) {
 
         imageEl.src =
             song.imagePath;
     }
 
-    if(miniPlayerImage &&
-       song.imagePath){
+    if (miniPlayerImage &&
+        song.imagePath) {
 
         miniPlayerImage.src =
             song.imagePath;
@@ -181,8 +214,8 @@ function updatePlayerUI(song){
 
     // UPDATE NOW PLAYING LINK
 
-    if(nowPlayingLink &&
-       song.songId){
+    if (nowPlayingLink &&
+        song.songId) {
 
         nowPlayingLink.href =
             "/usr/nowPlaying?songId="
@@ -194,7 +227,7 @@ function updatePlayerUI(song){
 // SAVE TO LOCAL STORAGE
 // ======================================================
 
-function saveSong(song){
+function saveSong(song) {
 
     localStorage.setItem(
         "currentSongId",
@@ -236,9 +269,13 @@ function saveSong(song){
 // PLAY SONG FROM BUTTON
 // ======================================================
 
+/**
+ * Triggered by UI button to play a specific song.
+ * @param {HTMLElement} button - element with data-* attributes for the song
+ */
 function playSong(button){
 
-    if(!button){
+    if (!button) {
 
         return;
     }
@@ -275,30 +312,35 @@ function playSong(button){
         "/api/songs/setCurrent?index="
         + index,
         {
-            method:"POST"
+            method: "POST"
         }
     );
-	fetch("/api/queue/add?songId=" + song.songId,{
-	    method:"POST"
-	})
-	.then(() => {
+    fetch("/api/queue/add?songId=" + song.songId, {
+        method: "POST"
+    })
+        .then(() => {
 
-	    console.log("Added to queue");
+            console.log("Added to queue");
 
-	});
+        });
 }
 
 // ======================================================
 // LOAD SONG OBJECT
 // ======================================================
 
+/**
+ * Load a song object into the global audio player and start playback.
+ * Ensures the current audio is paused before switching sources.
+ * @param {{songId:string,title:string,artist:string,imagePath:string,filePath:string}} song
+ */
 function loadSong(song){
 
-	if(!song || !song.filePath){
+    if (!song || !song.filePath) {
 
-	       console.error("loadSong: invalid song", song);
-	       return;
-	   }
+        console.error("loadSong: invalid song", song);
+        return;
+    }
     // UPDATE UI
 
     updatePlayerUI(song);
@@ -312,6 +354,7 @@ function loadSong(song){
 
     // SET AUDIO
 
+    globalAudioPlayer.pause();
     globalAudioPlayer.src =
         "/" + cleanPath;
 
@@ -321,17 +364,19 @@ function loadSong(song){
 
     globalAudioPlayer.play()
 
-    .then(() => {
+        .then(() => {
 
-        saveSong(song);
+            saveSong(song);
 
-    })
+        })
 
-    .catch(error => {
+        .catch(error => {
 
-        console.error(error);
+            if (error.name !== "AbortError") {
+                console.error(error);
+            }
 
-    });
+        });
 
     // INCREMENT REPEAT COUNT
 
@@ -339,55 +384,55 @@ function loadSong(song){
         "/usr/song/incrementRepeat?songId="
         + song.songId,
         {
-            method:"POST"
+            method: "POST"
         }
     );
-	
-	fetch("/api/queue/get")
-	.then(r => r.json())
-	.then(data => console.log(data));
+
 }
 
 // ======================================================
 // NEXT SONG
 // ======================================================
 
+/**
+ * Advance to the next song. Fetches next song from server or random fallback.
+ */
 function nextSong(){
-	
-	const currentSongId =
-	        localStorage.getItem(
-	            "currentSongId"
-	        );
 
-	// ADD CURRENT SONG TO PREVIOUS QUEUE (fire and forget)
+    const currentSongId =
+        localStorage.getItem(
+            "currentSongId"
+        );
 
-	    if(currentSongId){
-	        fetch("/api/queue/add?songId=" + currentSongId, { method:"POST" })
-	        .catch(error => console.error(error));
-	    }
+    // ADD CURRENT SONG TO PREVIOUS QUEUE (fire and forget)
 
-	    // INCREMENT POINTER THEN FETCH NEXT
+    if (currentSongId) {
+        fetch("/api/queue/add?songId=" + currentSongId, { method: "POST" })
+            .catch(error => console.error(error));
+    }
 
-		fetch("/api/songs/next" + (window.isShuffle ? "?shuffle=true" : ""))
-		    .then(response => {
-		        if(!response.ok) throw new Error("HTTP " + response.status);
-		        return response.text();
-		    })
-		    .then(data => {
-		        if(!data || data.trim() === "" || data.trim() === "null"){
-		            throw new Error("Empty response");
-		        }
+    // INCREMENT POINTER THEN FETCH NEXT
 
-	        const song = JSON.parse(data);
-	        if(song) loadSong(song);
-	    })
-	    .catch(error => {
-	        console.error(error);
-	        fetch("/api/songs/random")
-	        .then(res => res.json())
-	        .then(song => { if(song) loadSong(song); });
-	    });
-		//fetch("/api/queue/get").then(r=>r.json()).then(q=>console.log(q))
+    fetch("/api/songs/next" + (window.isShuffle ? "?shuffle=true" : ""))
+        .then(response => {
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            return response.text();
+        })
+        .then(data => {
+            if (!data || data.trim() === "" || data.trim() === "null") {
+                throw new Error("Empty response");
+            }
+
+            const song = JSON.parse(data);
+            if (song) loadSong(song);
+        })
+        .catch(error => {
+            console.error(error);
+            fetch("/api/songs/random")
+                .then(res => res.json())
+                .then(song => { if (song) loadSong(song); });
+        });
+    //fetch("/api/queue/get").then(r=>r.json()).then(q=>console.log(q))
 }
 
 
@@ -396,23 +441,26 @@ function nextSong(){
 // PREVIOUS SONG
 // ======================================================
 
+/**
+ * Request the previous song from server and load it.
+ */
 function prevSong(){
 
     fetch("/api/songs/previous")
 
-    .then(response => response.json())
+        .then(response => response.json())
 
-    .then(song => {
+        .then(song => {
 
-        loadSong(song);
+            loadSong(song);
 
-    })
+        })
 
-    .catch(error => {
+        .catch(error => {
 
-        console.error(error);
+            console.error(error);
 
-    });
+        });
 }
 
 // ======================================================
@@ -431,18 +479,18 @@ globalAudioPlayer.addEventListener(
 // PLAY / PAUSE
 // ======================================================
 
-function togglePlay(){
+function togglePlay() {
 
-    if(!globalAudioPlayer.src){
+    if (!globalAudioPlayer.src) {
 
         return;
     }
 
-    if(globalAudioPlayer.paused){
+    if (globalAudioPlayer.paused) {
 
         globalAudioPlayer.play();
 
-    }else{
+    } else {
 
         globalAudioPlayer.pause();
     }
@@ -452,7 +500,7 @@ function togglePlay(){
 // PLAY ALL SONGS
 // ======================================================
 
-function playAllSongs(button){
+function playAllSongs(button) {
 
     const playlistId =
         button.getAttribute("data-playlistid");
@@ -460,28 +508,28 @@ function playAllSongs(button){
     // LOAD PLAYLIST INTO QUEUE
     fetch(
         "/api/queue/loadPlaylist?playlistId=" + playlistId,
-        { method:"POST" }
+        { method: "POST" }
     )
-    .then(() => {
+        .then(() => {
 
-        // FETCH FIRST SONG FROM QUEUE
-        return fetch("/api/songs/next");
-    })
-    .then(response => response.json())
-    .then(song => {
+            // FETCH FIRST SONG FROM QUEUE
+            return fetch("/api/songs/next");
+        })
+        .then(response => response.json())
+        .then(song => {
 
-        if(song){
-            loadSong(song);
-        }
-    })
-    .catch(error => console.error(error));
+            if (song) {
+                loadSong(song);
+            }
+        })
+        .catch(error => console.error(error));
 }
 
 // ======================================================
 // TOGGLE SHUFFLE
 // ======================================================
 
-function toggleShuffle(){
+function toggleShuffle() {
 
     window.isShuffle =
         !window.isShuffle;
@@ -496,7 +544,7 @@ function toggleShuffle(){
             "shuffleBtn"
         );
 
-    if(shuffleBtn){
+    if (shuffleBtn) {
 
         shuffleBtn.classList.toggle(
             "active",
@@ -509,7 +557,7 @@ function toggleShuffle(){
 // TOGGLE REPEAT
 // ======================================================
 
-function toggleRepeat(){
+function toggleRepeat() {
 
     window.isRepeat =
         !window.isRepeat;
@@ -527,7 +575,7 @@ function toggleRepeat(){
             "repeatBtn"
         );
 
-    if(repeatBtn){
+    if (repeatBtn) {
 
         repeatBtn.classList.toggle(
             "active",

@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: aura
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+  

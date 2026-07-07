@@ -1,5 +1,5 @@
 server:
-  port: 9090
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -12,9 +12,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/demo
-    username: root
-    password: POOJI
+    url: ${MYSQL_PUBLIC_URL}
+    username: ${MYSQL_DATABASE}
+    password: ${MYSQL_ROOT_PASSWORD}
 
   thymeleaf:
     prefix: classpath:/templates/
